@@ -1,7 +1,7 @@
 export default function PhysicalLayer() {
   return (
     <div>
-      <h1>Installed Apps</h1>
+      <h1>Physical Layer</h1>
     </div>
-  )
+  );
 }
