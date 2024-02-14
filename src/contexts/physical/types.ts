@@ -20,5 +20,10 @@ export interface RackSummary {
 
 export interface SiteSummary {
   name: string;
+  id: string;
   racks: RackSummary[];
+}
+
+export interface PhysicalLayerSummary {
+  sites: SiteSummary[];
 }
