@@ -10,7 +10,7 @@ export default function SiteCard({ name, racks }: SiteSummary) {
         <Heading size="md">
           <HStack justify="space-between">
             <span>{name}</span>
-            <Image src={Site} alt="rack" height="30px" />
+            <Image src={Site} alt="rack" height="30px" filter={useColorModeValue("", "invert(100%)")} />
           </HStack>
         </Heading>
       </CardHeader>
