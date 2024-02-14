@@ -1,8 +1,8 @@
-export type PhysicalDimensionStatus = "planned" | "active" | "warning" | "error";
+export type GeneralStatus = "planned" | "active" | "warning" | "error";
 
 export interface PhysicalDimensionSummary {
   name: string;
-  status: PhysicalDimensionStatus;
+  status: GeneralStatus;
 }
 
 export interface PhysicalDimensionSummaries {
