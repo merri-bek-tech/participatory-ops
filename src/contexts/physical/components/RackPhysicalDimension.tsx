@@ -1,11 +1,12 @@
 import { Heading, Box, Text, BoxProps, useColorModeValue, HStack } from "@chakra-ui/react";
 import { PhysicalDimensionStatus, PhysicalDimensionSummary } from "../types";
 
-type StatusColor = "green" | "gray";
+type StatusColor = "green" | "gray" | "orange" | "red";
 
 function PhysicalDimensionBox({ dashed, children, colour }: { dashed: boolean; colour: StatusColor; children: React.ReactNode }) {
   let boxProps: BoxProps = {
     p: 2,
+    borderWidth: 0,
   };
 
   if (dashed) {
@@ -28,6 +29,8 @@ function colourForStatus(status: PhysicalDimensionStatus): StatusColor {
   const statusColorMap: Record<PhysicalDimensionStatus, StatusColor> = {
     active: "green",
     planned: "gray",
+    warning: "orange",
+    error: "red",
   };
   return statusColorMap[status];
 }

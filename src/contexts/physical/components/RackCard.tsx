@@ -15,7 +15,7 @@ export default function RackCard({ name, dimensions }: RackSummary) {
         </Heading>
       </CardHeader>
 
-      <Stack spacing="1px">
+      <Stack spacing={1}>
         <RackPhysicalDimension {...dimensions.power} />
         <RackPhysicalDimension {...dimensions.compute} />
         <RackPhysicalDimension {...dimensions.storage} />

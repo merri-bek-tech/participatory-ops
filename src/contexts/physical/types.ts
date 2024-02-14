@@ -1,4 +1,4 @@
-export type PhysicalDimensionStatus = "planned" | "active";
+export type PhysicalDimensionStatus = "planned" | "active" | "warning" | "error";
 
 export interface PhysicalDimensionSummary {
   name: string;

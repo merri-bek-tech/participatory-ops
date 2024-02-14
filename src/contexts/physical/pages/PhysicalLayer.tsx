@@ -14,9 +14,9 @@ export default function PhysicalLayer() {
             id: "murnong",
             dimensions: {
               power: { name: "Power", status: "active" },
-              compute: { name: "Compute", status: "planned" },
-              storage: { name: "Storage", status: "planned" },
-              dataLink: { name: "Data link", status: "planned" },
+              compute: { name: "Compute", status: "active" },
+              storage: { name: "Storage", status: "active" },
+              dataLink: { name: "Data link", status: "active" },
             },
           },
         ],
@@ -29,10 +29,10 @@ export default function PhysicalLayer() {
             name: "Lilly Pilly",
             id: "lilly-pilly",
             dimensions: {
-              power: { name: "Power", status: "planned" },
-              compute: { name: "Compute", status: "planned" },
-              storage: { name: "Storage", status: "planned" },
-              dataLink: { name: "Data link", status: "planned" },
+              power: { name: "Power", status: "active" },
+              compute: { name: "Compute", status: "error" },
+              storage: { name: "Storage", status: "warning" },
+              dataLink: { name: "Data link", status: "active" },
             },
           },
           {
