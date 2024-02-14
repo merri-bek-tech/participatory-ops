@@ -95,9 +95,11 @@ export default function PhysicalLayer() {
   return (
     <Box>
       <Heading mb={4}>Physical Layer</Heading>
-      <SimpleGrid columns={3} spacing={4}>
+      <SimpleGrid columns={[1, 2, 3]} spacing={4}>
         {layer.sites.map((site: SiteSummary) => (
-          <SiteCard {...site} key={site.id} />
+          <Box>
+            <SiteCard {...site} key={site.id} />
+          </Box>
         ))}
       </SimpleGrid>
     </Box>
