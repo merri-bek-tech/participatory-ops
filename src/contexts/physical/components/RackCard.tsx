@@ -1,18 +1,19 @@
-import { Card, CardBody, CardHeader, Heading, Stack, StackDivider } from "@chakra-ui/react";
+import { Card, CardHeader, Heading, Stack } from "@chakra-ui/react";
 import RackPhysicalDimension from "./RackPhysicalDimension";
+import { RackSummary } from "../types";
 
-export default function RackCard() {
+export default function RackCard({ name, dimensions }: RackSummary) {
   return (
     <Card>
       <CardHeader>
-        <Heading size="md">Murnong</Heading>
+        <Heading size="md">{name}</Heading>
       </CardHeader>
 
       <Stack spacing="1px">
-        <RackPhysicalDimension name="Power" />
-        <RackPhysicalDimension name="Compute" />
-        <RackPhysicalDimension name="Storage" />
-        <RackPhysicalDimension name="Data link" />
+        <RackPhysicalDimension {...dimensions.power} />
+        <RackPhysicalDimension {...dimensions.compute} />
+        <RackPhysicalDimension {...dimensions.storage} />
+        <RackPhysicalDimension {...dimensions.dataLink} />
       </Stack>
     </Card>
   );

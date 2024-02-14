@@ -1,14 +1,25 @@
 import { Heading, Box, Text } from "@chakra-ui/react";
+import { PhysicalDimensionSummary } from "../types";
 
-export default function RackPhysicalDimension({ name }: { name: string }) {
+function PhysicalDimensionBox({ planned, children }: { planned: boolean; children: React.ReactNode }) {
+  if (planned) {
+    return (
+      <Box bgColor="gray.300" p={2} borderColor="gray.500" borderWidth="3px" borderStyle="dashed">
+        {children}
+      </Box>
+    );
+  }
+
+  return <Box>{children}</Box>;
+}
+
+export default function RackPhysicalDimension({ name, status }: PhysicalDimensionSummary) {
   return (
-    <Box bgColor="gray.300" p={2}>
+    <PhysicalDimensionBox planned={status == "planned"}>
       <Heading size="xs" textTransform="uppercase">
         {name}
       </Heading>
-      <Text pt="2" fontSize="sm">
-        not set up
-      </Text>
-    </Box>
+      <Text fontSize="sm">{status}</Text>
+    </PhysicalDimensionBox>
   );
 }
