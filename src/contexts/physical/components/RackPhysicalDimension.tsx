@@ -1,25 +1,46 @@
-import { Heading, Box, Text } from "@chakra-ui/react";
-import { PhysicalDimensionSummary } from "../types";
+import { Heading, Box, Text, BoxProps, useColorModeValue, HStack } from "@chakra-ui/react";
+import { PhysicalDimensionStatus, PhysicalDimensionSummary } from "../types";
 
-function PhysicalDimensionBox({ planned, children }: { planned: boolean; children: React.ReactNode }) {
-  if (planned) {
-    return (
-      <Box bgColor="gray.300" p={2} borderColor="gray.500" borderWidth="3px" borderStyle="dashed">
-        {children}
-      </Box>
-    );
+type StatusColor = "green" | "gray";
+
+function PhysicalDimensionBox({ dashed, children, colour }: { dashed: boolean; colour: StatusColor; children: React.ReactNode }) {
+  let boxProps: BoxProps = {
+    p: 2,
+  };
+
+  if (dashed) {
+    boxProps.borderColor = useColorModeValue("gray.500", "gray.600");
+    boxProps.borderWidth = "3px";
+    boxProps.borderStyle = "dashed";
   }
 
-  return <Box>{children}</Box>;
+  let bgHue = useColorModeValue("300", "600");
+  if (colour === "gray") bgHue = useColorModeValue("200", "500");
+
+  return (
+    <Box {...boxProps} bgColor={`${colour}.${bgHue}`}>
+      {children}
+    </Box>
+  );
+}
+
+function colourForStatus(status: PhysicalDimensionStatus): StatusColor {
+  const statusColorMap: Record<PhysicalDimensionStatus, StatusColor> = {
+    active: "green",
+    planned: "gray",
+  };
+  return statusColorMap[status];
 }
 
 export default function RackPhysicalDimension({ name, status }: PhysicalDimensionSummary) {
   return (
-    <PhysicalDimensionBox planned={status == "planned"}>
-      <Heading size="xs" textTransform="uppercase">
-        {name}
-      </Heading>
-      <Text fontSize="sm">{status}</Text>
+    <PhysicalDimensionBox dashed={status == "planned"} colour={colourForStatus(status)}>
+      <HStack justify="space-between">
+        <Heading size="xs" textTransform="uppercase">
+          {name}
+        </Heading>
+        <Text fontSize="sm">{status}</Text>
+      </HStack>
     </PhysicalDimensionBox>
   );
 }

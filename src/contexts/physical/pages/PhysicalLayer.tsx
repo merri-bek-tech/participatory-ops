@@ -13,7 +13,7 @@ export default function PhysicalLayer() {
             name: "Murnong",
             id: "murnong",
             dimensions: {
-              power: { name: "Power", status: "planned" },
+              power: { name: "Power", status: "active" },
               compute: { name: "Compute", status: "planned" },
               storage: { name: "Storage", status: "planned" },
               dataLink: { name: "Data link", status: "planned" },
