@@ -1,4 +1,4 @@
-import { Box, SimpleGrid, Heading } from "@chakra-ui/react";
+import { Box, Grid, GridItem, Heading } from "@chakra-ui/react";
 import SiteCard from "../components/SiteCard";
 import { PhysicalLayerSummary, SiteSummary } from "../types";
 
@@ -95,13 +95,13 @@ export default function PhysicalLayer() {
   return (
     <Box>
       <Heading mb={4}>Physical Layer</Heading>
-      <SimpleGrid columns={[1, 2, 3]} spacing={4}>
+      <Grid templateColumns={["repeat(1, 1fr)", "repeat(2m 1fr)", "repeat(3, 1fr)"]} gap={4}>
         {layer.sites.map((site: SiteSummary) => (
-          <Box>
+          <GridItem width="100%" key={site.id} colSpan={Math.min(site.racks.length, 3)}>
             <SiteCard {...site} key={site.id} />
-          </Box>
+          </GridItem>
         ))}
-      </SimpleGrid>
+      </Grid>
     </Box>
   );
 }
