@@ -28,6 +28,7 @@ export interface SiteSummary {
 export interface RackDetails {
   id: string
   name: string
+  dimensions: PhysicalDimensionSummaries
 }
 
 export interface PhysicalLayerSummary {

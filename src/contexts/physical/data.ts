@@ -92,6 +92,12 @@ const layer: PhysicalLayerSummary = {
     murnong: {
       id: "murnong",
       name: "Murnong",
+      dimensions: {
+        power: { name: "Power", status: "active" },
+        compute: { name: "Compute", status: "active" },
+        storage: { name: "Storage", status: "active" },
+        dataLink: { name: "Data link", status: "active" },
+      },
     },
   },
 }
