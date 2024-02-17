@@ -1,5 +1,5 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
-import { PhysicalLayer } from "./contexts/physical";
+import { PhysicalLayout, SiteList, RackDetails } from "./contexts/physical";
 import { Layout } from "./contexts/shared";
 import { VirtualLayer } from "./contexts/virtual";
 
@@ -10,7 +10,14 @@ export const router = createBrowserRouter([
     children: [
       { path: "", element: <Navigate to="/physical" replace /> },
       { path: "virtual", element: <VirtualLayer /> },
-      { path: "physical", element: <PhysicalLayer /> },
+      {
+        path: "physical",
+        element: <PhysicalLayout />,
+        children: [
+          { path: "", element: <SiteList /> },
+          { path: "rack/:id", element: <RackDetails /> },
+        ],
+      },
     ],
   },
 ]);

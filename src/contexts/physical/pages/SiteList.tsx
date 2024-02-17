@@ -1,9 +1,9 @@
-import { Box, Grid, GridItem, Heading, Text } from "@chakra-ui/react";
+import { Box, Grid, GridItem } from "@chakra-ui/react";
 import SiteCard from "../components/SiteCard";
 import { PhysicalLayerSummary, SiteSummary } from "../types";
-import { LayerNav, Link } from "../../shared";
+import { LayerNav } from "../../shared";
 
-export default function PhysicalLayer() {
+export default function SiteList() {
   const layer: PhysicalLayerSummary = {
     sites: [
       {
@@ -94,15 +94,12 @@ export default function PhysicalLayer() {
   };
 
   return (
-    <Box>
-      <LayerNav activeLayer="physical" />
-      <Grid templateColumns={["repeat(1, 1fr)", "repeat(2m 1fr)", "repeat(3, 1fr)"]} gap={4}>
-        {layer.sites.map((site: SiteSummary) => (
-          <GridItem width="100%" key={site.id} colSpan={Math.min(site.racks.length, 3)}>
-            <SiteCard {...site} key={site.id} />
-          </GridItem>
-        ))}
-      </Grid>
-    </Box>
+    <Grid templateColumns={["repeat(1, 1fr)", "repeat(2m 1fr)", "repeat(3, 1fr)"]} gap={4}>
+      {layer.sites.map((site: SiteSummary) => (
+        <GridItem width="100%" key={site.id} colSpan={Math.min(site.racks.length, 3)}>
+          <SiteCard {...site} key={site.id} />
+        </GridItem>
+      ))}
+    </Grid>
   );
 }
