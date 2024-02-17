@@ -12,7 +12,8 @@ const ruHeightOriginal = 55
 const widthOriginal = 585
 
 const width = 400
-const ruHeight = (ruHeightOriginal / widthOriginal) * width
+const ruHeight = Math.floor((ruHeightOriginal / widthOriginal) * width)
+const ruGap = 4
 
 type ComponentImageNames = "switch" | "server" | "raid" | "spacer"
 
@@ -39,9 +40,11 @@ const images: Record<ComponentImageNames, Record<number, string>> = {
 function RackComponentBox({ children, ru, imageName, faded }: { children?: React.ReactNode; ru: number; imageName: ComponentImageNames; faded?: boolean }) {
   const sizes = images[imageName]
   const image = sizes && (sizes[ru] || sizes[1])
+  const gapHeight = ruGap * Math.max(ru - 1, 0)
+  const height = ruHeight * ru + gapHeight
 
   return (
-    <Box height={ruHeight * ru} pos="relative" opacity={faded ? 0.3 : 1.0}>
+    <Box height={height} pos="relative" opacity={faded ? 0.3 : 1.0}>
       {image && <Image src={image} pos="absolute" top={0} left={0} width="100%" height="100%" opacity={1.0} zIndex={0} alt="" />}
 
       <Box zIndex={1} pos="absolute" top={0} left={0} width="100%" height="100%">
@@ -89,29 +92,37 @@ function Raid({ name, ru }: { name: string; ru: number }) {
 
 function Spacer({ ru }: { ru: number }) {
   if (ru == 1) return <RackComponentBox ru={ru} imageName="spacer" faded={true} />
+}
 
+function RuLabels({ ru }: { ru: number }) {
   return (
-    <Box>
+    <Stack direction="column" height="100%" gap={`${ruGap}px`} px={1}>
       {Array.from({ length: ru }).map((_, i) => (
-        <Spacer key={i} ru={1} />
+        <Center key={i} height={ruHeight} fontSize="small" fontWeight="bold" lineHeight="100%">
+          {ru - i}
+        </Center>
       ))}
-    </Box>
+    </Stack>
   )
 }
 
 export default function PhysicalLayout() {
   return (
-    <Stack maxW={width} w="100%" gap={1} backgroundColor={useColorModeValue("gray.800", "black")} padding={1}>
-      <NetworkSwitch name="Switch 1" ru={1} />
-      <NetworkSwitch name="Switch 2" ru={2} />
-      <Server name="Compute 1" ru={2} />
-      <Spacer ru={1} />
-      <Server name="Compute 2" ru={1} />
-      <Server name="Compute 2" ru={1} />
-      <Spacer ru={2} />
-      <Server name="Compute 2" ru={3} />
-      <Raid name="RAID 1" ru={3} />
-      <Raid name="RAID 2" ru={2} />
+    <Stack direction="row" maxW={width} w="100%" gap={1} backgroundColor={useColorModeValue("gray.800", "black")} padding={1}>
+      <RuLabels ru={18} />
+      <Stack direction="column" w="100%" gap={`${ruGap}px`}>
+        <NetworkSwitch name="Switch 1" ru={1} />
+        <NetworkSwitch name="Switch 2" ru={2} />
+        <Server name="Compute 1" ru={2} />
+        <Spacer ru={1} />
+        <Server name="Compute 2" ru={1} />
+        <Server name="Compute 2" ru={1} />
+        <Spacer ru={1} />
+        <Spacer ru={1} />
+        <Server name="Compute 2" ru={3} />
+        <Raid name="RAID 1" ru={3} />
+        <Raid name="RAID 2" ru={2} />
+      </Stack>
     </Stack>
   )
 }
