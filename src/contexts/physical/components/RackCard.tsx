@@ -1,11 +1,11 @@
-import { Card, CardHeader, Heading, Stack, Image, Text, HStack, useColorModeValue, Button } from "@chakra-ui/react";
-import RackPhysicalDimension from "./RackPhysicalDimension";
-import { RackSummary } from "../types";
-import Rack from "/rack.png";
-import { useNavigate } from "react-router-dom";
+import { Card, CardHeader, Heading, Stack, Image, Text, HStack, useColorModeValue, Button } from "@chakra-ui/react"
+import RackPhysicalDimension from "./RackPhysicalDimension"
+import { RackSummary } from "../types"
+import Rack from "/rack.png"
+import { useNavigate } from "react-router-dom"
 
-export default function RackCard({ name, id, dimensions }: RackSummary) {
-  const navigate = useNavigate();
+export default function RackCard({ name, id, detailUrl, dimensions }: RackSummary) {
+  const navigate = useNavigate()
 
   return (
     <Card>
@@ -13,8 +13,8 @@ export default function RackCard({ name, id, dimensions }: RackSummary) {
         <Heading size="md" pl={2}>
           <HStack justify="space-between">
             <span>{name}</span>
-            <Button colorScheme="cyan" onClick={() => navigate(`/physical/rack/${id}`)}>
-              <Image src={Rack} alt="rack" height="30px" filter={useColorModeValue("", "invert(100%)")} />
+            <Button colorScheme="cyan" isDisabled={!detailUrl} onClick={() => detailUrl && navigate(detailUrl)}>
+              <Image src={Rack} alt="rack" height="30px" />
             </Button>
           </HStack>
         </Heading>
@@ -27,5 +27,5 @@ export default function RackCard({ name, id, dimensions }: RackSummary) {
         <RackPhysicalDimension {...dimensions.dataLink} />
       </Stack>
     </Card>
-  );
+  )
 }
