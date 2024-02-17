@@ -1,4 +1,4 @@
-import { Box, Stack, Image, Center, useColorModeValue } from "@chakra-ui/react"
+import { Box, Stack, Image, Center, Text, useColorModeValue } from "@chakra-ui/react"
 import Switch1Ru from "/rack-components/switch-1ru.png"
 import Switch2Ru from "/rack-components/switch-2ru.png"
 import Server1Ru from "/rack-components/server-1ru.png"
@@ -96,11 +96,13 @@ function Spacer({ ru }: { ru: number }) {
 
 function RuLabels({ ru }: { ru: number }) {
   return (
-    <Stack direction="column" height="100%" gap={`${ruGap}px`} px={1}>
+    <Stack direction="column" height="100%" gap={`${ruGap}px`} pr={1}>
       {Array.from({ length: ru }).map((_, i) => (
-        <Center key={i} height={ruHeight} fontSize="small" fontWeight="bold" lineHeight="100%">
-          {ru - i}
-        </Center>
+        <Box key={i} height={ruHeight} display="flex" flexDirection="column" justifyContent="center" alignItems="flex-end">
+          <Text fontSize="small" fontWeight="bold" lineHeight="100%">
+            {ru - i}
+          </Text>
+        </Box>
       ))}
     </Stack>
   )
@@ -108,7 +110,7 @@ function RuLabels({ ru }: { ru: number }) {
 
 export default function PhysicalLayout() {
   return (
-    <Stack direction="row" maxW={width} w="100%" gap={1} backgroundColor={useColorModeValue("gray.800", "black")} padding={1}>
+    <Stack direction="row" maxW={width} w="100%" gap={1} backgroundColor={useColorModeValue("gray.800", "black")} padding={3} borderRadius={5}>
       <RuLabels ru={18} />
       <Stack direction="column" w="100%" gap={`${ruGap}px`}>
         <NetworkSwitch name="Switch 1" ru={1} />
