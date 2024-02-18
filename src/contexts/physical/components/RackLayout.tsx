@@ -99,7 +99,7 @@ function RuLabels({ ru }: { ru: number }) {
     <Stack direction="column" height="100%" gap={`${ruGap}px`} pr={1}>
       {Array.from({ length: ru }).map((_, i) => (
         <Box key={i} height={ruHeight} display="flex" flexDirection="column" justifyContent="center" alignItems="flex-end">
-          <Text fontSize="small" fontWeight="bold" lineHeight="100%">
+          <Text fontSize="small" fontWeight="bold" lineHeight="100%" color="gray.100">
             {ru - i}
           </Text>
         </Box>
