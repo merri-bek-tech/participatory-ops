@@ -12,5 +12,5 @@ func main() {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 	e.Static("/", "/app/web")
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":1323"))
 }
