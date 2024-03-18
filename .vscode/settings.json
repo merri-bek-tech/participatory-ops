@@ -1,0 +1,8 @@
+{
+  "editor.formatOnSave": true,
+  "ansible.python.interpreterPath": "/bin/python3",
+  "editor.wordWrapColumn": 120,
+  "html.format.wrapLineLength": 150,
+  "prettier.semi": false,
+  "editor.wordWrap": "on"
+}
