@@ -1,5 +1,6 @@
-import { Box, Flex, useColorModeValue, Stack } from "@chakra-ui/react";
-import ColorModeSwitcher from "./ColorModeSwitcher";
+import { Box, Flex, useColorModeValue, Stack } from "@chakra-ui/react"
+import ColorModeSwitcher from "./ColorModeSwitcher"
+import Link from "./Link"
 
 export default function Navbar() {
   return (
@@ -9,12 +10,14 @@ export default function Navbar() {
           <Box>Merri-bek Tech</Box>
         </Stack>
 
-        <Flex alignItems={"center"}>
+        <Flex alignItems={"center"} gap={4}>
+          <Link href="/">Layers</Link>
+          <Link href="/inbox">Inbox</Link>
           <Stack direction={"row"} spacing={7}>
             <ColorModeSwitcher />
           </Stack>
         </Flex>
       </Flex>
     </Box>
-  );
+  )
 }
