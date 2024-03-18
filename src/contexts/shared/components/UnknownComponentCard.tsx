@@ -1,6 +1,6 @@
 import { Card, CardBody, CardHeader, Heading, Table, TableContainer, Tbody, Td, Text, Th, Tr, useColorModeValue } from "@chakra-ui/react"
 
-interface UnknownComponent {
+export interface UnknownComponent {
   status: "online" | "offline"
   uuid: string
 }
@@ -21,7 +21,7 @@ export default function UnknownComponentCard({ status, uuid }: UnknownComponent)
       </CardHeader>
       <CardBody>
         <TableContainer>
-          <Table __css={{ "table-layout": "fixed", width: "full" }} variant="simple">
+          <Table __css={{ tableLayout: "fixed", width: "full" }} variant="simple">
             <Tbody>
               <Tr>
                 <Th p={0} w="50px">
