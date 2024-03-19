@@ -17,6 +17,7 @@ func main() {
 	e := echo.New()
 
 	e.Pre(rewriteExcept([]string{"/api", "/assets"}, map[string]string{"^/*": "/"}))
+	e.Use(middleware.CORS())
 
 	e.GET("/api", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
