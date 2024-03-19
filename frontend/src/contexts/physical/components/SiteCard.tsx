@@ -1,7 +1,7 @@
 import { Card, CardBody, CardHeader, HStack, Heading, Image, useColorModeValue, Grid, GridItem } from "@chakra-ui/react"
 import RackCard from "./RackCard"
 import { SiteSummary } from "../types"
-import Site from "/site.png"
+import Site from "../../../assets/site.png"
 
 export default function SiteCard({ name, racks }: SiteSummary) {
   const multiRack = racks.length > 1

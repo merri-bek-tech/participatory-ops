@@ -1,12 +1,12 @@
 import { Box, Stack, Image, Center, Text, useColorModeValue } from "@chakra-ui/react"
-import Switch1Ru from "/rack-components/switch-1ru.png"
-import Switch2Ru from "/rack-components/switch-2ru.png"
-import Server1Ru from "/rack-components/server-1ru.png"
-import Server2Ru from "/rack-components/server-2ru.png"
-import Server3Ru from "/rack-components/server-3ru.png"
-import Raid2Ru from "/rack-components/raid-2ru.png"
-import Raid3Ru from "/rack-components/raid-3ru.png"
-import Spacer1Ru from "/rack-components/spacer-1ru.png"
+import Switch1Ru from "../../../assets/rack-components/switch-1ru.png"
+import Switch2Ru from "../../../assets/rack-components/switch-2ru.png"
+import Server1Ru from "../../../assets/rack-components/server-1ru.png"
+import Server2Ru from "../../../assets/rack-components/server-2ru.png"
+import Server3Ru from "../../../assets/rack-components/server-3ru.png"
+import Raid2Ru from "../../../assets/rack-components/raid-2ru.png"
+import Raid3Ru from "../../../assets/rack-components/raid-3ru.png"
+import Spacer1Ru from "../../../assets/rack-components/spacer-1ru.png"
 
 const ruHeightOriginal = 55
 const widthOriginal = 585

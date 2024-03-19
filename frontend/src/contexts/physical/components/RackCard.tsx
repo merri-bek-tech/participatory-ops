@@ -1,7 +1,7 @@
 import { Card, CardHeader, Heading, Stack, Image, Text, HStack, useColorModeValue, Button } from "@chakra-ui/react"
 import RackPhysicalDimension from "./RackPhysicalDimension"
 import { RackSummary } from "../types"
-import Rack from "/rack.png"
+import Rack from "../../../assets/rack.png"
 import { useNavigate } from "react-router-dom"
 
 export default function RackCard({ name, id, detailUrl, dimensions }: RackSummary) {
