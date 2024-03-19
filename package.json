@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "frontend": "cd frontend && npm run dev",
-    "api": "cd api && go run .",
-    "dev": "concurrently \"npm run frontend\" \"npm run api\""
+    "watch-frontend": "cd frontend && npm run dev",
+    "watch-api": "cd api && nodemon --watch './**/*.go' --signal SIGTERM --exec 'go' run server.go",
+    "dev": "concurrently \"npm run watch-frontend\" \"npm run watch-api\" \"open http://localhost:5173/\""
   },
   "author": "",
   "license": "GPL3",
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.0"
   }
 }
