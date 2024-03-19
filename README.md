@@ -12,3 +12,7 @@ ParOps consists of the following parts:
 ## Development
 
 ### Running Locally
+
+To run both frontend and api simultaneously, we use `nodemon` to execute both. This is a nodejs based tool, but you should already have that installed to run the frontend.
+
+To execute, run `npm run dev`.
