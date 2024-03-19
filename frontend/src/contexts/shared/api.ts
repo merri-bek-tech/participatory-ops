@@ -15,6 +15,7 @@ class Api {
 
   constructor(base_url?: string) {
     this.base_url = base_url || getApiHost()
+    console.log("url", this.base_url)
   }
 
   inbox(): Promise<UnknownComponent[]> {

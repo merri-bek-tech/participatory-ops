@@ -2,7 +2,7 @@ import { Box, Grid, GridItem, Heading } from "@chakra-ui/react"
 import UnknownComponentCard from "../components/UnknownComponentCard"
 import { UnknownComponent } from "../types"
 import Api from "../api"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 const api = new Api()
 
@@ -14,10 +14,12 @@ export default function Inbox() {
     { status: "offline", uuid: "8431928b-a906-40de-bae2-ab30dfe5e2e4" },
     { status: "online", uuid: "8431928b-a906-40de-bae2-ab30dfe5e2e5" },
   ]
+  const [components, setComponents] = useState<UnknownComponent[]>([])
 
   useEffect(() => {
-    api.inbox().then((components) => {
-      console.log("components", components)
+    api.inbox().then((data) => {
+      console.log("data", data)
+      setComponents(data)
     })
   }, [])
 
@@ -25,7 +27,7 @@ export default function Inbox() {
     <Box>
       <Heading>Inbox</Heading>
       <Grid templateColumns={["repeat(1, 1fr)", "repeat(1, 1fr)", "repeat(2, 1fr)"]} gap={4} mt={2}>
-        {data.map((component) => (
+        {components.map((component) => (
           <GridItem key={component.uuid}>
             <UnknownComponentCard {...component} />
           </GridItem>

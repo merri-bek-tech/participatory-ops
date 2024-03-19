@@ -43,6 +43,9 @@ func rewriteExcept(paths []string, rules map[string]string) echo.MiddlewareFunc 
 					return true
 				}
 			}
+			if c.Request().Header.Get("Content-Type") == "application/json" {
+				return true
+			}
 			return false
 		},
 		Rules: rules,
