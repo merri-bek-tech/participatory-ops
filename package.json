@@ -1,0 +1,15 @@
+{
+  "name": "parops",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "frontend": "cd frontend && npm run dev",
+    "api": "cd api && go run .",
+    "dev": "concurrently \"npm run frontend\" \"npm run api\""
+  },
+  "author": "",
+  "license": "GPL3",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
