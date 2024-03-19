@@ -1,9 +1,5 @@
 import { Card, CardBody, CardHeader, Heading, Table, TableContainer, Tbody, Td, Text, Th, Tr, useColorModeValue } from "@chakra-ui/react"
-
-export interface UnknownComponent {
-  status: "online" | "offline"
-  uuid: string
-}
+import { UnknownComponent } from "../types"
 
 export default function UnknownComponentCard({ status, uuid }: UnknownComponent) {
   const colors = {

@@ -1,5 +1,10 @@
 import { Box, Grid, GridItem, Heading } from "@chakra-ui/react"
-import UnknownComponentCard, { UnknownComponent } from "../components/UnknownComponentCard"
+import UnknownComponentCard from "../components/UnknownComponentCard"
+import { UnknownComponent } from "../types"
+import Api from "../api"
+import { useEffect } from "react"
+
+const api = new Api()
 
 export default function Inbox() {
   const data: UnknownComponent[] = [
@@ -9,6 +14,12 @@ export default function Inbox() {
     { status: "offline", uuid: "8431928b-a906-40de-bae2-ab30dfe5e2e4" },
     { status: "online", uuid: "8431928b-a906-40de-bae2-ab30dfe5e2e5" },
   ]
+
+  useEffect(() => {
+    api.inbox().then((components) => {
+      console.log("components", components)
+    })
+  }, [])
 
   return (
     <Box>
