@@ -7,6 +7,7 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/google/uuid"
 )
 
 // this callback triggers when a message is received, it then prints the message (in the payload) and topic
@@ -25,16 +26,18 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 }
 
 func main() {
+	clientId := uuid.New().String()
+
 	client := connectClient(
 		"82e12caef57c4c8288d08fe23854c097.s1.eu.hivemq.cloud",
 		8883,
 		"paropd",
 		"be9eiQuo",
-		"test1",
+		clientId,
 	)
 
 	// subscribe(client)
-	publishLoop(client)
+	publishLoop(client, clientId)
 
 	client.Disconnect(250)
 }
@@ -72,9 +75,9 @@ func connectClient(host string, port int, username string, password string, clie
 // 	fmt.Printf("Subscribed to topic: %s\n", topic)
 // }
 
-func publishLoop(client mqtt.Client) {
+func publishLoop(client mqtt.Client, clientId string) {
 	for i := 0; i < 2; i++ {
-		token := publishHeartbeat(client)
+		token := publishHeartbeat(client, clientId)
 		handleResult(token)
 		time.Sleep(time.Second)
 	}
@@ -91,9 +94,9 @@ func handleResult(token mqtt.Token) {
 	}
 }
 
-type Component struct {
-	Uuid   string `json:"uuid"`
-	Status string `json:"status"`
+type ComponentHeartbeat struct {
+	Uuid string `json:"uuid"`
+	At   int64  `json:"at"`
 }
 
 type Meta struct {
@@ -109,19 +112,21 @@ func jsonString(input any) string {
 	return string(output)
 }
 
-func publishHeartbeat(client mqtt.Client) mqtt.Token {
+func publishHeartbeat(client mqtt.Client, clientId string) mqtt.Token {
 	meta := Meta{
-		Type:    "heartbeat",
-		Version: "0.1.0",
+		Type:    "ComponentHeartbeat",
+		Version: "1.0",
 	}
 
-	payload := Component{
-		Uuid:   "f08b7172-36d8-447f-85e1-41403d2730c8",
-		Status: "online",
+	payload := ComponentHeartbeat{
+		Uuid: clientId,
+		At:   time.Now().Unix(),
 	}
 
 	metaText := jsonString(meta)
 	payloadText := jsonString(payload)
 
-	return client.Publish("topic/test", 0, false, strings.Join([]string{metaText, payloadText}, "|"))
+	qos := byte(0) // 0 = at most once, 1 = at least once, 2 = exactly once
+
+	return client.Publish("topic/test", qos, false, strings.Join([]string{metaText, payloadText}, "|"))
 }
