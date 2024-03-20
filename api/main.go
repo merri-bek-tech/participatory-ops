@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -16,7 +15,7 @@ type UnknownComponent struct {
 func main() {
 	e := echo.New()
 
-	e.Pre(rewriteExcept([]string{"/api", "/assets"}, map[string]string{"^/*": "/"}))
+	e.Pre(rewriteFrontEndPaths())
 	e.Use(middleware.CORS())
 
 	e.GET("/api", func(c echo.Context) error {
@@ -33,21 +32,4 @@ func getInbox(c echo.Context) error {
 		{Uuid: "f08b7172-36d8-447f-85e1-41403d2730c8", Status: "online"},
 	}
 	return c.JSON(http.StatusOK, components)
-}
-
-func rewriteExcept(paths []string, rules map[string]string) echo.MiddlewareFunc {
-	return middleware.RewriteWithConfig(middleware.RewriteConfig{
-		Skipper: func(c echo.Context) bool {
-			for _, p := range paths {
-				if strings.HasPrefix(c.Request().URL.Path, p) {
-					return true
-				}
-			}
-			if c.Request().Header.Get("Content-Type") == "application/json" {
-				return true
-			}
-			return false
-		},
-		Rules: rules,
-	})
 }
