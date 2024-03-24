@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -28,25 +27,22 @@ func main() {
 
 	e.Static("/", "/app/web")
 
-	go componentCache(cache)
+	go populateComponentCache(cache)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
 
-func withCache(next func(c echo.Context, cache map[string]Component) error, cache map[string]Component) echo.HandlerFunc {
-	return func(context echo.Context) error {
-		return next(context, cache)
-	}
-}
-
-func getInbox(c echo.Context, cache map[string]Component) error {
+func getInbox(c echo.Context, cache ComponentCache) error {
 	components := make([]ComponentStatus, 0, len(cache))
 	for _, cacheItem := range cache {
-		fmt.Println("mapping cacheItem", cacheItem)
+		status := "unknown"
+		if secondsSinceUpdate(cacheItem) < 10 {
+			status = "online"
+		}
 
 		component := ComponentStatus{
 			Uuid:   cacheItem.Uuid,
-			Status: "unknown",
+			Status: status,
 		}
 
 		components = append(components, component)
