@@ -3,25 +3,22 @@ import UnknownComponentCard from "../components/UnknownComponentCard"
 import { UnknownComponent } from "../types"
 import Api from "../api"
 import { useEffect, useState } from "react"
+import { useInterval } from "usehooks-ts"
 
 const api = new Api()
 
 export default function Inbox() {
-  const data: UnknownComponent[] = [
-    { status: "online", uuid: "8431928b-a906-40de-bae2-ab30dfe5e2e1" },
-    { status: "offline", uuid: "8431928b-a906-40de-bae2-ab30dfe5e2e2" },
-    { status: "online", uuid: "8431928b-a906-40de-bae2-ab30dfe5e2e3" },
-    { status: "offline", uuid: "8431928b-a906-40de-bae2-ab30dfe5e2e4" },
-    { status: "online", uuid: "8431928b-a906-40de-bae2-ab30dfe5e2e5" },
-  ]
   const [components, setComponents] = useState<UnknownComponent[]>([])
 
-  useEffect(() => {
+  const pollApi = () => {
     api.inbox().then((data) => {
-      console.log("data", data)
       setComponents(data)
+      console.log(data)
     })
-  }, [])
+  }
+
+  useInterval(pollApi, 2000)
+  useEffect(pollApi, [])
 
   return (
     <Box>
