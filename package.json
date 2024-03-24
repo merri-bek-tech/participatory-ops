@@ -4,8 +4,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch-frontend": "cd frontend && npm run dev",
-    "watch-api": "cd api && nodemon --watch './**/*.go' --signal SIGTERM --exec 'go' run .",
-    "dev": "concurrently \"npm run watch-frontend\" \"npm run watch-api\" \"open http://localhost:5173/\""
+    "watch-api": "cd api && nodemon --watch './*.go' --signal SIGTERM --exec 'go' run .",
+    "dev": "concurrently \"npm run watch-frontend\" \"npm run watch-api\""
   },
   "author": "",
   "license": "GPL3",
