@@ -1,4 +1,4 @@
-package main
+package componentcache
 
 import (
 	"time"
@@ -15,7 +15,7 @@ type ComponentCache map[string]Component
 
 type HandlerWithComponentCache func(c echo.Context, cache ComponentCache) error
 
-func withCache(next HandlerWithComponentCache, cache ComponentCache) echo.HandlerFunc {
+func WithCache(next HandlerWithComponentCache, cache ComponentCache) echo.HandlerFunc {
 	return func(context echo.Context) error {
 		return next(context, cache)
 	}
@@ -25,7 +25,15 @@ func secondsSinceUpdate(component Component) int64 {
 	return time.Now().Unix() - component.At
 }
 
-func populateComponentCache(cache ComponentCache) {
+func Status(component Component) string {
+	status := "unknown"
+	if secondsSinceUpdate(component) < 10 {
+		status = "online"
+	}
+	return status
+}
+
+func PopulateComponentCache(cache ComponentCache) {
 	time.Sleep(3 * time.Second)
 
 	cache["f08b7172-36d8-447f-85e1-41403d2730c8"] = Component{
