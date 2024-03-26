@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	cache "parops/component_cache"
 	comms "parops/component_comms"
@@ -30,9 +31,15 @@ func main() {
 	e.Static("/", "/app/web")
 
 	go cache.PopulateComponentCache(cacheData)
-	go comms.MonitorComponents()
+	go comms.MonitorComponents(comms.CommsHandlers{
+		HandleHeartbeat: handleHeartbeat,
+	})
 
 	e.Logger.Fatal(e.Start(":1323"))
+}
+
+func handleHeartbeat(heartbeat comms.ComponentHeartbeat) {
+	fmt.Println("Received heartbeat: ", heartbeat)
 }
 
 func getInbox(c echo.Context, cacheData cache.ComponentCache) error {

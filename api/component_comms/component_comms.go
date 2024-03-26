@@ -10,7 +10,11 @@ import (
 	uuid "github.com/google/uuid"
 )
 
-func MonitorComponents() {
+type CommsHandlers struct {
+	HandleHeartbeat func(heartbeat ComponentHeartbeat)
+}
+
+func MonitorComponents(handlers CommsHandlers) {
 	clientId := "api-" + uuid.New().String()
 
 	client := connectClient(
@@ -21,7 +25,7 @@ func MonitorComponents() {
 		clientId,
 	)
 
-	subscribe(client)
+	subscribe(client, handlers)
 
 	fmt.Println("Monitoring components finished")
 }
@@ -38,11 +42,7 @@ type ComponentHeartbeat struct {
 
 // PRIVATE
 
-func handleHeartbeat(heartbeat ComponentHeartbeat) {
-	fmt.Println("Received heartbeat: ", heartbeat)
-}
-
-func handleHeartbeatMessage(_ Meta, contents string) {
+func handleHeartbeatMessage(handlers CommsHandlers, _ Meta, contents string) {
 	fmt.Println("Received heartbeat message: ", contents)
 
 	var heartbeat ComponentHeartbeat
@@ -52,19 +52,19 @@ func handleHeartbeatMessage(_ Meta, contents string) {
 		return
 	}
 
-	handleHeartbeat(heartbeat)
+	handlers.HandleHeartbeat(heartbeat)
 }
 
-func handleParopsMessage(meta Meta, contents string) {
+func handleParopsMessage(handlers CommsHandlers, meta Meta, contents string) {
 	switch meta.Type {
 	case "ComponentHeartbeat":
-		handleHeartbeatMessage(meta, contents)
+		handleHeartbeatMessage(handlers, meta, contents)
 	default:
 		fmt.Println("Unknown message type: ", meta.Type)
 	}
 }
 
-func handleMqttMessage(client mqtt.Client, msg mqtt.Message) {
+func handleMqttMessage(handlers CommsHandlers, client mqtt.Client, msg mqtt.Message) {
 	//fmt.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
 
 	// split the message payload by |
@@ -88,13 +88,17 @@ func handleMqttMessage(client mqtt.Client, msg mqtt.Message) {
 		return
 	}
 
-	handleParopsMessage(meta, contentsString)
+	handleParopsMessage(handlers, meta, contentsString)
 }
 
-func subscribe(client mqtt.Client) {
+func subscribe(client mqtt.Client, handlers CommsHandlers) {
+	handler := func(client mqtt.Client, msg mqtt.Message) {
+		handleMqttMessage(handlers, client, msg)
+	}
+
 	// subscribe to the same topic, that was published to, to receive the messages
 	topic := "topic/test"
-	token := client.Subscribe(topic, 1, handleMqttMessage)
+	token := client.Subscribe(topic, 1, handler)
 	token.Wait()
 	// Check for errors during subscribe (More on error reporting https://pkg.go.dev/github.com/eclipse/paho.mqtt.golang#readme-error-handling)
 	if token.Error() != nil {
