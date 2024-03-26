@@ -2,7 +2,8 @@ package main
 
 import (
 	"net/http"
-	comps "parops/componentcache"
+	cache "parops/component_cache"
+	comms "parops/component_comms"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -14,7 +15,7 @@ type ComponentStatus struct {
 }
 
 func main() {
-	cache := make(map[string]comps.Component)
+	cacheData := make(map[string]cache.Component)
 
 	e := echo.New()
 
@@ -24,21 +25,22 @@ func main() {
 	e.GET("/api", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-	e.GET("/api/inbox", comps.WithCache(getInbox, cache))
+	e.GET("/api/inbox", cache.WithCache(getInbox, cacheData))
 
 	e.Static("/", "/app/web")
 
-	go comps.PopulateComponentCache(cache)
+	go cache.PopulateComponentCache(cacheData)
+	go comms.MonitorComponents()
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
 
-func getInbox(c echo.Context, cache comps.ComponentCache) error {
-	components := make([]ComponentStatus, 0, len(cache))
-	for _, cacheItem := range cache {
+func getInbox(c echo.Context, cacheData cache.ComponentCache) error {
+	components := make([]ComponentStatus, 0, len(cacheData))
+	for _, cacheItem := range cacheData {
 		component := ComponentStatus{
 			Uuid:   cacheItem.Uuid,
-			Status: comps.Status(cacheItem),
+			Status: cache.Status(cacheItem),
 		}
 
 		components = append(components, component)

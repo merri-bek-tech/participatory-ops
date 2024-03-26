@@ -1,4 +1,4 @@
-package componentcache
+package component_cache
 
 import (
 	"time"
@@ -21,10 +21,6 @@ func WithCache(next HandlerWithComponentCache, cache ComponentCache) echo.Handle
 	}
 }
 
-func secondsSinceUpdate(component Component) int64 {
-	return time.Now().Unix() - component.At
-}
-
 func Status(component Component) string {
 	status := "unknown"
 	if secondsSinceUpdate(component) < 10 {
@@ -40,4 +36,10 @@ func PopulateComponentCache(cache ComponentCache) {
 		Uuid: "f08b7172-36d8-447f-85e1-41403d2730c8",
 		At:   time.Now().Unix(),
 	}
+}
+
+// PRIVATE
+
+func secondsSinceUpdate(component Component) int64 {
+	return time.Now().Unix() - component.At
 }
