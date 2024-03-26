@@ -1,6 +1,7 @@
 package component_comms
 
 import (
+	"crypto/tls"
 	"fmt"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -44,6 +45,8 @@ func connectClient(host string, port int, username string, password string, clie
 	opts.SetClientID(clientId) // set a name as you desire
 	opts.SetUsername(username) // these are the credentials that you declare for your cluster (see readme)
 	opts.SetPassword(password)
+	opts.SetTLSConfig(&tls.Config{InsecureSkipVerify: true})
+
 	// (optionally) configure callback handlers that get called on certain events
 	// opts.SetDefaultPublishHandler(messagePubHandler)
 	// opts.OnConnect = connectHandler
