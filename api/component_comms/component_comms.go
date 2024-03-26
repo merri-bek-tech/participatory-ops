@@ -2,7 +2,9 @@ package component_comms
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	uuid "github.com/google/uuid"
@@ -24,12 +26,75 @@ func MonitorComponents() {
 	fmt.Println("Monitoring components finished")
 }
 
+type Meta struct {
+	Type    string `json:"type"`
+	Version string `json:"version"`
+}
+
+type ComponentHeartbeat struct {
+	Uuid string `json:"uuid"`
+	At   int64  `json:"at"`
+}
+
 // PRIVATE
+
+func handleHeartbeat(heartbeat ComponentHeartbeat) {
+	fmt.Println("Received heartbeat: ", heartbeat)
+}
+
+func handleHeartbeatMessage(_ Meta, contents string) {
+	fmt.Println("Received heartbeat message: ", contents)
+
+	var heartbeat ComponentHeartbeat
+	err := json.Unmarshal([]byte(contents), &heartbeat)
+	if err != nil {
+		fmt.Println("Failed to parse heartbeat: ", err)
+		return
+	}
+
+	handleHeartbeat(heartbeat)
+}
+
+func handleParopsMessage(meta Meta, contents string) {
+	switch meta.Type {
+	case "ComponentHeartbeat":
+		handleHeartbeatMessage(meta, contents)
+	default:
+		fmt.Println("Unknown message type: ", meta.Type)
+	}
+}
+
+func handleMqttMessage(client mqtt.Client, msg mqtt.Message) {
+	//fmt.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
+
+	// split the message payload by |
+	payload := string(msg.Payload())
+	payloadParts := strings.Split(payload, "|")
+
+	if len(payloadParts) != 2 {
+		fmt.Println("Invalid message format")
+		return
+	}
+
+	// get the meta and the contents from the payloadParts
+	metaString := payloadParts[0]
+	contentsString := payloadParts[1]
+
+	// parse Meta from the meta string
+	var meta Meta
+	err := json.Unmarshal([]byte(metaString), &meta)
+	if err != nil {
+		fmt.Println("Failed to parse meta")
+		return
+	}
+
+	handleParopsMessage(meta, contentsString)
+}
 
 func subscribe(client mqtt.Client) {
 	// subscribe to the same topic, that was published to, to receive the messages
 	topic := "topic/test"
-	token := client.Subscribe(topic, 1, nil)
+	token := client.Subscribe(topic, 1, handleMqttMessage)
 	token.Wait()
 	// Check for errors during subscribe (More on error reporting https://pkg.go.dev/github.com/eclipse/paho.mqtt.golang#readme-error-handling)
 	if token.Error() != nil {
