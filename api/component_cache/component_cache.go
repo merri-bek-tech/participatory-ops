@@ -44,15 +44,6 @@ func OnHeartbeat(heartbeat events.ComponentHeartbeat, cache ComponentCache) {
 	}
 }
 
-func PopulateComponentCache(cache ComponentCache) {
-	time.Sleep(3 * time.Second)
-
-	cache["f08b7172-36d8-447f-85e1-41403d2730c8"] = Component{
-		Uuid: "f08b7172-36d8-447f-85e1-41403d2730c8",
-		At:   time.Now().Unix(),
-	}
-}
-
 // PRIVATE
 
 func secondsSinceUpdate(component Component) int64 {

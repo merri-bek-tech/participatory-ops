@@ -30,7 +30,6 @@ func main() {
 
 	e.Static("/", "/app/web")
 
-	go cache.PopulateComponentCache(cacheData)
 	go comms.MonitorComponents(comms.CommsHandlers{
 		HandleHeartbeat: func(heartbeat events.ComponentHeartbeat) {
 			cache.OnHeartbeat(heartbeat, cacheData)
