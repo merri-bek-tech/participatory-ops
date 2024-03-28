@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	events "parops/component_events"
 	"strings"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -11,7 +12,7 @@ import (
 )
 
 type CommsHandlers struct {
-	HandleHeartbeat func(heartbeat ComponentHeartbeat)
+	HandleHeartbeat func(heartbeat events.ComponentHeartbeat)
 }
 
 func MonitorComponents(handlers CommsHandlers) {
@@ -25,7 +26,7 @@ func MonitorComponents(handlers CommsHandlers) {
 		clientId,
 	)
 
-	subscribe(client, handlers)
+	subscribe("components/*", client, handlers)
 
 	fmt.Println("Monitoring components finished")
 }
@@ -35,17 +36,12 @@ type Meta struct {
 	Version string `json:"version"`
 }
 
-type ComponentHeartbeat struct {
-	Uuid string `json:"uuid"`
-	At   int64  `json:"at"`
-}
-
 // PRIVATE
 
 func handleHeartbeatMessage(handlers CommsHandlers, _ Meta, contents string) {
 	fmt.Println("Received heartbeat message: ", contents)
 
-	var heartbeat ComponentHeartbeat
+	var heartbeat events.ComponentHeartbeat
 	err := json.Unmarshal([]byte(contents), &heartbeat)
 	if err != nil {
 		fmt.Println("Failed to parse heartbeat: ", err)
@@ -91,13 +87,12 @@ func handleMqttMessage(handlers CommsHandlers, client mqtt.Client, msg mqtt.Mess
 	handleParopsMessage(handlers, meta, contentsString)
 }
 
-func subscribe(client mqtt.Client, handlers CommsHandlers) {
+func subscribe(topic string, client mqtt.Client, handlers CommsHandlers) {
 	handler := func(client mqtt.Client, msg mqtt.Message) {
 		handleMqttMessage(handlers, client, msg)
 	}
 
 	// subscribe to the same topic, that was published to, to receive the messages
-	topic := "topic/test"
 	token := client.Subscribe(topic, 1, handler)
 	token.Wait()
 	// Check for errors during subscribe (More on error reporting https://pkg.go.dev/github.com/eclipse/paho.mqtt.golang#readme-error-handling)

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	cache "parops/component_cache"
 	comms "parops/component_comms"
+	events "parops/component_events"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -32,14 +32,11 @@ func main() {
 
 	go cache.PopulateComponentCache(cacheData)
 	go comms.MonitorComponents(comms.CommsHandlers{
-		HandleHeartbeat: handleHeartbeat,
-	})
+		HandleHeartbeat: func(heartbeat events.ComponentHeartbeat) {
+			cache.OnHeartbeat(heartbeat, cacheData)
+		}})
 
 	e.Logger.Fatal(e.Start(":1323"))
-}
-
-func handleHeartbeat(heartbeat comms.ComponentHeartbeat) {
-	fmt.Println("Received heartbeat: ", heartbeat)
 }
 
 func getInbox(c echo.Context, cacheData cache.ComponentCache) error {

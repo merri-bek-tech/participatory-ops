@@ -36,8 +36,8 @@ func main() {
 		clientId,
 	)
 
-	// subscribe(client)
-	publishLoop(client, clientId)
+	publishHeartbeat("components/"+clientId, client, clientId)
+	publishHeartbeat("components/"+clientId, client, clientId)
 
 	client.Disconnect(250)
 }
@@ -60,27 +60,6 @@ func connectClient(host string, port int, username string, password string, clie
 	}
 
 	return client
-}
-
-// func subscribe(client mqtt.Client) {
-// 	// subscribe to the same topic, that was published to, to receive the messages
-// 	topic := "topic/test"
-// 	token := client.Subscribe(topic, 1, nil)
-// 	token.Wait()
-// 	// Check for errors during subscribe (More on error reporting https://pkg.go.dev/github.com/eclipse/paho.mqtt.golang#readme-error-handling)
-// 	if token.Error() != nil {
-// 		fmt.Print("Failed to subscribe to topic\n")
-// 		panic(token.Error())
-// 	}
-// 	fmt.Printf("Subscribed to topic: %s\n", topic)
-// }
-
-func publishLoop(client mqtt.Client, clientId string) {
-	for i := 0; i < 2; i++ {
-		token := publishHeartbeat(client, clientId)
-		handleResult(token)
-		time.Sleep(time.Second)
-	}
 }
 
 func handleResult(token mqtt.Token) {
@@ -112,7 +91,7 @@ func jsonString(input any) string {
 	return string(output)
 }
 
-func publishHeartbeat(client mqtt.Client, clientId string) mqtt.Token {
+func publishHeartbeat(topic string, client mqtt.Client, clientId string) mqtt.Token {
 	meta := Meta{
 		Type:    "ComponentHeartbeat",
 		Version: "1.0",
@@ -128,5 +107,5 @@ func publishHeartbeat(client mqtt.Client, clientId string) mqtt.Token {
 
 	qos := byte(0) // 0 = at most once, 1 = at least once, 2 = exactly once
 
-	return client.Publish("topic/test", qos, false, strings.Join([]string{metaText, payloadText}, "|"))
+	return client.Publish(topic, qos, false, strings.Join([]string{metaText, payloadText}, "|"))
 }
