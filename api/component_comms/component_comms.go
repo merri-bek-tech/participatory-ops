@@ -26,7 +26,7 @@ func MonitorComponents(handlers CommsHandlers) {
 		clientId,
 	)
 
-	subscribe("components/*", client, handlers)
+	subscribe("components/+", client, handlers)
 
 	fmt.Println("Monitoring components finished")
 }
