@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"paropd/comms"
 	config "paropd/config"
 )
 
@@ -9,18 +10,9 @@ func main() {
 	configData := config.LoadConfig(true)
 	fmt.Printf("Loaded config: %+v\n", configData.Computed)
 
-	// configData, err := config.LoadConfig(false)
-	// if err != nil {
-	// 	panic(err)
-	// } else {
-	// 	fmt.Printf("Loaded config: %+v\n", configData.Computed)
-	// }
+	client := comms.Connect(configData.Computed.Uuid)
 
-	// deviceId := uuid.New().String()
+	client.PublishHeartbeat()
 
-	// client := comms.Connect(deviceId)
-
-	// client.PublishHeartbeat()
-
-	// client.Disconnect()
+	client.Disconnect()
 }
