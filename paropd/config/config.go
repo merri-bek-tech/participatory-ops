@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"paropd/config/computed"
@@ -10,44 +11,49 @@ type Config struct {
 	Computed *computed.ComputedConfig
 }
 
-func LoadConfig(recompute bool) (*Config, error) {
+func LoadConfig(recompute bool) *Config {
 	configDir := ensureBestConfigDir()
 
 	fmt.Println("configDir:", configDir)
 
-	// file := configDir + "/computed.pkl"
-	// info, err := os.Stat(file)
-	// if err != nil {
-	// 	fmt.Printf("error getting file info: %v\n", err)
-	// 	return nil, err
-	// }
-	// if info.Mode().Perm()&0444 == 0444 {
-	// 	fmt.Println("file has readable permission")
-	// } else {
-	// 	fmt.Println("file does not have readable permission")
-	// }
+	computed := loadComputedConfig(configDir, recompute)
 
-	// if recompute {
-	// 	return nil, nil
-	// }
-
-	// computedConfig, err := computed.LoadFromPath(context.Background(), configDir+"/computed.pkl")
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// return &Config{Computed: computedConfig}, nil
-	return nil, nil
+	return &Config{
+		Computed: computed,
+	}
 }
 
 // Private
 
-func ensureBestConfigDir() string {
+func loadComputedConfig(configDir string, recompute bool) *computed.ComputedConfig {
+	filePath := configDir + "/computed.pkl"
+
+	if canReadFile(filePath) {
+		computedConfig, err := computed.LoadFromPath(context.Background(), configDir+"/computed.pkl")
+		if err != nil {
+			fmt.Println("Error loading computed config:", err)
+			return &computed.ComputedConfig{}
+		}
+		return computedConfig
+	}
+
+	return &computed.ComputedConfig{}
+}
+
+func candidateConfigDirs() []string {
 	basename := "paropd"
-	candidateDirs := []string{"/etc/" + basename, "~/.config/" + basename}
+
+	return []string{
+		"/etc/" + basename,
+		replaceTildeWithHomeDir("~/.config/" + basename),
+	}
+}
+
+func ensureBestConfigDir() string {
+	candidateDirs := candidateConfigDirs()
 
 	for _, dir := range candidateDirs {
-		if canReadOrMake(dir) {
+		if canReadOrMakeDir(dir) {
 			return dir
 		}
 	}
@@ -55,14 +61,26 @@ func ensureBestConfigDir() string {
 	panic("Could not find a suitable config directory")
 }
 
-func canReadOrMake(dir string) bool {
-	absDir := replaceTildeWithHomeDir(dir)
-	_, err := os.Stat(absDir)
+func canReadFile(path string) bool {
+	_, err := os.Stat(path)
 
 	if err == nil {
 		return true
 	} else if os.IsNotExist(err) {
-		return canMake(absDir)
+		return false
+	} else {
+		fmt.Println("Error checking for file:", err)
+	}
+	return false
+}
+
+func canReadOrMakeDir(dir string) bool {
+	_, err := os.Stat(dir)
+
+	if err == nil {
+		return true
+	} else if os.IsNotExist(err) {
+		return canMake(dir)
 	} else {
 		fmt.Println("Error checking for directory:", err)
 	}

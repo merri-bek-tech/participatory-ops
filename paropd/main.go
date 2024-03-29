@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	config "paropd/config"
 )
 
 func main() {
-	config.LoadConfig(false)
+	configData := config.LoadConfig(false)
+	fmt.Printf("Loaded config: %+v\n", configData.Computed)
+
 	// configData, err := config.LoadConfig(false)
 	// if err != nil {
 	// 	panic(err)
