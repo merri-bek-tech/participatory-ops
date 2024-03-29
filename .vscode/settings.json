@@ -19,5 +19,5 @@
     "node_modules": true
   },
   "explorerExclude.backup": {},
-  "cSpell.words": ["Mqtt", "Parops"]
+  "cSpell.words": ["Mqtt", "paropd", "Parops"]
 }
