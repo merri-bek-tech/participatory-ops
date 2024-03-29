@@ -3,4 +3,5 @@ module paropd.config.ComputedConfig
 
 import "package://pkg.pkl-lang.org/pkl-go/pkl.golang@0.6.0#/go.pkl"
 
+uuid: String
 hostName: String

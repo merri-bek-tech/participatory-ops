@@ -8,6 +8,8 @@ import (
 )
 
 type ComputedConfig struct {
+	Uuid string `pkl:"uuid"`
+
 	HostName string `pkl:"hostName"`
 }
 

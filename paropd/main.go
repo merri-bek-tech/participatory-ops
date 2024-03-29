@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	comms "paropd/comms"
 	config "paropd/config/computed"
 
@@ -13,7 +14,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	} else {
-		println("Hostname from config: ", sampleConfig.HostName)
+		fmt.Printf("Loaded config: %+v\n", sampleConfig)
 	}
 
 	deviceId := uuid.New().String()
