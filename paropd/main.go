@@ -1,20 +1,19 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	comms "paropd/comms"
-	config "paropd/config/computed"
+	config "paropd/config"
 
 	"github.com/google/uuid"
 )
 
 func main() {
-	sampleConfig, err := config.LoadFromPath(context.Background(), "./config/computed/sample.pkl")
+	configData, err := config.LoadConfig(false)
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Printf("Loaded config: %+v\n", sampleConfig)
+		fmt.Printf("Loaded config: %+v\n", configData)
 	}
 
 	deviceId := uuid.New().String()
