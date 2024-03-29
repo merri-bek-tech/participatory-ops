@@ -1,6 +1,7 @@
 package component_cache
 
 import (
+	"fmt"
 	events "parops/components/component_events"
 	"time"
 
@@ -12,9 +13,10 @@ type ComponentDetails struct {
 }
 
 type Component struct {
-	Uuid      string            `json:"uuid"`
-	UpdatedAt int64             `json:"at"`
-	Details   *ComponentDetails `json:"details"`
+	Uuid               string            `json:"uuid"`
+	UpdatedAt          int64             `json:"at"`
+	Details            *ComponentDetails `json:"details"`
+	DetailsRequestedAt int64
 }
 
 type ComponentCache map[string]Component
@@ -33,7 +35,7 @@ func WithCache(next HandlerWithComponentCache, cache ComponentCache) echo.Handle
 
 func Status(component Component) string {
 	status := "unknown"
-	if secondsSinceUpdate(component) < 10 {
+	if secondsSince(component.UpdatedAt) < 10 {
 		status = "online"
 	}
 	return status
@@ -41,21 +43,35 @@ func Status(component Component) string {
 
 func OnHeartbeat(heartbeat events.ComponentHeartbeat, cache ComponentCache) {
 	existing, exists := cache[heartbeat.Uuid]
-	if !exists || existing.UpdatedAt < heartbeat.At {
+
+	if !exists {
 		cache[heartbeat.Uuid] = Component{
 			Uuid:      heartbeat.Uuid,
 			UpdatedAt: heartbeat.At,
 		}
+	} else {
+		existing.UpdatedAt = heartbeat.At
 	}
 }
 
-func HasDetails(uuid string, cache ComponentCache) bool {
+func (cache ComponentCache) FetchComponent(uuid string) (*Component, bool) {
 	component, exists := cache[uuid]
-	return exists && component.Details != nil
+	return &component, exists
+}
+
+func (component *Component) NeedsDetails(minCheckSeconds int64) bool {
+	fmt.Println("Details last requested at: ", component.DetailsRequestedAt)
+
+	return component.Details == nil && secondsSince(component.DetailsRequestedAt) > minCheckSeconds
+}
+
+func (component *Component) DetailsRequested() {
+	component.DetailsRequestedAt = time.Now().Unix()
+	fmt.Printf("detailsRequestedAt updated: %v\n", component)
 }
 
 // PRIVATE
 
-func secondsSinceUpdate(component Component) int64 {
-	return time.Now().Unix() - component.UpdatedAt
+func secondsSince(timestamp int64) int64 {
+	return time.Now().Unix() - timestamp
 }
