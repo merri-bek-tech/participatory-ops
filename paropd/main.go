@@ -13,7 +13,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	} else {
-		fmt.Printf("Loaded config: %+v\n", configData)
+		fmt.Printf("Loaded config: %+v\n", configData.Computed)
 	}
 
 	deviceId := uuid.New().String()
