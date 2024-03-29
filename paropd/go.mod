@@ -3,6 +3,7 @@ module paropd
 go 1.21.0
 
 require (
+	dario.cat/mergo v1.0.0 // indirect
 	github.com/apple/pkl-go v0.6.0 // indirect
 	github.com/eclipse/paho.mqtt.golang v1.4.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect

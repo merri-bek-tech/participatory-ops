@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"paropd/config/computed"
+
+	"github.com/google/uuid"
 )
 
 type Config struct {
@@ -28,16 +30,46 @@ func LoadConfig(recompute bool) *Config {
 func loadComputedConfig(configDir string, recompute bool) *computed.ComputedConfig {
 	filePath := configDir + "/computed.pkl"
 
+	// read existing computed config
+	data := readExistingComputedConfig(filePath)
+
+	// if it doesn't exist, or recompute is true, recompute it
+	if data == nil || recompute {
+		data = recomputeComputedConfig(data)
+	}
+
+	// save it to disk
+
+	return data
+}
+
+func readExistingComputedConfig(filePath string) *computed.ComputedConfig {
 	if canReadFile(filePath) {
-		computedConfig, err := computed.LoadFromPath(context.Background(), configDir+"/computed.pkl")
+		computedConfig, err := computed.LoadFromPath(context.Background(), filePath)
 		if err != nil {
 			fmt.Println("Error loading computed config:", err)
-			return &computed.ComputedConfig{}
+			return nil
 		}
 		return computedConfig
 	}
+	return nil
+}
 
-	return &computed.ComputedConfig{}
+func recomputeComputedConfig(existing *computed.ComputedConfig) *computed.ComputedConfig {
+	keep := computed.ComputedConfig{}
+	if existing != nil && existing.Uuid != "" {
+		keep.Uuid = existing.Uuid
+	}
+
+	changed := computed.ComputedConfig{
+		Uuid:     keep.Uuid,
+		HostName: "dummyhost",
+	}
+	if changed.Uuid == "" {
+		changed.Uuid = uuid.New().String()
+	}
+
+	return &changed
 }
 
 func candidateConfigDirs() []string {
