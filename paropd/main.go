@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"os/signal"
@@ -28,6 +27,8 @@ func main() {
 
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGHUP)
+
+	log.SetOutput(os.Stdout)
 
 	app := &AppData{}
 
@@ -57,7 +58,7 @@ func main() {
 		}
 	}()
 
-	if err := run(ctx, app, os.Stdout); err != nil {
+	if err := run(ctx, app); err != nil {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
 		os.Exit(1)
 	}
@@ -85,9 +86,8 @@ func (app *AppData) close() {
 	}
 }
 
-func run(ctx context.Context, app *AppData, stdout io.Writer) error {
+func run(ctx context.Context, app *AppData) error {
 	app.init()
-	log.SetOutput(stdout)
 
 	for {
 		select {

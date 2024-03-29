@@ -1,7 +1,7 @@
 package component_cache
 
 import (
-	events "parops/component_events"
+	events "parops/components/component_events"
 	"time"
 
 	"github.com/labstack/echo/v4"

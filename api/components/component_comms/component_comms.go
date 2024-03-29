@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	events "parops/component_events"
+	events "parops/components/component_events"
 	"strings"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"

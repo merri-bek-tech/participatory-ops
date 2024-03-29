@@ -2,9 +2,8 @@ package main
 
 import (
 	"net/http"
-	cache "parops/component_cache"
-	comms "parops/component_comms"
-	events "parops/component_events"
+	comps "parops/components"
+	cache "parops/components/component_cache"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -30,10 +29,7 @@ func main() {
 
 	e.Static("/", "/app/web")
 
-	go comms.MonitorComponents(comms.CommsHandlers{
-		HandleHeartbeat: func(heartbeat events.ComponentHeartbeat) {
-			cache.OnHeartbeat(heartbeat, cacheData)
-		}})
+	go comps.MonitorComponents(cacheData)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
