@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	configData := config.LoadConfig(false)
+	configData := config.LoadConfig(true)
 	fmt.Printf("Loaded config: %+v\n", configData.Computed)
 
 	// configData, err := config.LoadConfig(false)

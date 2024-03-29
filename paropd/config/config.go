@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"paropd/config/computed"
+	"reflect"
+	"strconv"
 
 	"github.com/google/uuid"
 )
@@ -36,9 +38,10 @@ func loadComputedConfig(configDir string, recompute bool) *computed.ComputedConf
 	// if it doesn't exist, or recompute is true, recompute it
 	if data == nil || recompute {
 		data = recomputeComputedConfig(data)
-	}
 
-	// save it to disk
+		// save it to disk
+		writeComputedConfig(filePath, data)
+	}
 
 	return data
 }
@@ -70,6 +73,48 @@ func recomputeComputedConfig(existing *computed.ComputedConfig) *computed.Comput
 	}
 
 	return &changed
+}
+
+func writeComputedConfig(filePath string, data *computed.ComputedConfig) {
+	// open file for writing
+	file, err := os.Create(filePath)
+	if err != nil {
+		fmt.Println("Error creating computed config file:", err)
+		return
+	}
+	defer file.Close()
+
+	// write data to file
+	output := dummyPklOutput(data)
+	_, err = file.WriteString(output)
+	if err != nil {
+		fmt.Println("Error writing computed config file:", err)
+	}
+}
+
+// Pkl should do this for us, this is a hack
+func dummyPklOutput(data *computed.ComputedConfig) string {
+	s := *data
+	v := reflect.ValueOf(s)
+	typeOfS := v.Type()
+
+	output := ""
+
+	for i := 0; i < v.NumField(); i++ {
+		key := typeOfS.Field(i).Tag.Get("pkl")
+		value := dummyPklValueOutput(v.Field(i).Interface())
+		line := fmt.Sprintf("%s = %s", key, value)
+		output += line + "\n"
+	}
+	return output
+}
+
+func dummyPklValueOutput(input interface{}) string {
+	if str, ok := input.(string); ok {
+		return strconv.Quote(str)
+	}
+
+	return fmt.Sprintf("%v", input)
 }
 
 func candidateConfigDirs() []string {
