@@ -17,39 +17,6 @@ import (
 
 const defaultTick = 3 * time.Second
 
-// func main() {
-// 	// configData := config.LoadConfig(true)
-// 	// fmt.Printf("Loaded config: %+v\n", configData.Computed)
-
-// 	// client := comms.Connect(configData.Computed.Uuid)
-
-// 	// client.PublishHeartbeat()
-
-// 	// client.Disconnect()
-
-// 	ctx := context.Background()
-// 	ctx, cancel := context.WithCancel(ctx)
-
-// 	defer func() {
-// 		cancel()
-// 	}()
-
-// 	if err := run(ctx); err != nil {
-// 		fmt.Println("About to exit")
-// 		fmt.Fprintf(os.Stderr, "%s\n", err)
-// 		os.Exit(1)
-// 	}
-// }
-
-// type config struct {
-// 	contentType string
-// 	server      string
-// 	statusCode  int
-// 	tick        time.Duration
-// 	url         string
-// 	userAgent   string
-// }
-
 type AppData struct {
 	config *configs.Config
 	client *comms.Client
@@ -78,7 +45,7 @@ func main() {
 				case syscall.SIGHUP:
 					app.init()
 				case os.Interrupt:
-					fmt.Println("Interrupted.")
+					log.Println("Interrupted.")
 					app.close()
 					cancel()
 					os.Exit(1)

@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"paropd/config/computed"
 	"reflect"
@@ -18,7 +19,7 @@ type Config struct {
 func LoadConfig(recompute bool) *Config {
 	configDir := ensureBestConfigDir()
 
-	fmt.Println("configDir:", configDir)
+	log.Println("configDir:", configDir)
 
 	computed := loadComputedConfig(configDir, recompute)
 
@@ -50,7 +51,7 @@ func readExistingComputedConfig(filePath string) *computed.ComputedConfig {
 	if canReadFile(filePath) {
 		computedConfig, err := computed.LoadFromPath(context.Background(), filePath)
 		if err != nil {
-			fmt.Println("Error loading computed config:", err)
+			log.Println("Error loading computed config:", err)
 			return nil
 		}
 		return computedConfig
@@ -79,7 +80,7 @@ func writeComputedConfig(filePath string, data *computed.ComputedConfig) {
 	// open file for writing
 	file, err := os.Create(filePath)
 	if err != nil {
-		fmt.Println("Error creating computed config file:", err)
+		log.Println("Error creating computed config file:", err)
 		return
 	}
 	defer file.Close()
@@ -88,7 +89,7 @@ func writeComputedConfig(filePath string, data *computed.ComputedConfig) {
 	output := dummyPklOutput(data)
 	_, err = file.WriteString(output)
 	if err != nil {
-		fmt.Println("Error writing computed config file:", err)
+		log.Println("Error writing computed config file:", err)
 	}
 }
 
@@ -146,7 +147,7 @@ func canReadFile(path string) bool {
 	} else if os.IsNotExist(err) {
 		return false
 	} else {
-		fmt.Println("Error checking for file:", err)
+		log.Println("Error checking for file:", err)
 	}
 	return false
 }
@@ -159,7 +160,7 @@ func canReadOrMakeDir(dir string) bool {
 	} else if os.IsNotExist(err) {
 		return canMake(dir)
 	} else {
-		fmt.Println("Error checking for directory:", err)
+		log.Println("Error checking for directory:", err)
 	}
 	return false
 }
@@ -167,7 +168,7 @@ func canReadOrMakeDir(dir string) bool {
 func canMake(dir string) bool {
 	err := os.Mkdir(dir, 0755)
 	if err != nil {
-		fmt.Println("Error making directory:", err)
+		log.Println("Error making directory:", err)
 		return false
 	}
 	return true

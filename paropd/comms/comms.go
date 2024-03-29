@@ -3,6 +3,7 @@ package comms
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -51,7 +52,7 @@ func (client *Client) PublishHeartbeat() {
 // PRIVATE
 
 func transmitHeartbeat(topic string, client mqtt.Client, clientId string) mqtt.Token {
-	fmt.Println("Publishing heartbeat")
+	log.Println("Publishing heartbeat")
 
 	meta := Meta{
 		Type:    "ComponentHeartbeat",
@@ -103,24 +104,24 @@ func handleResult(token mqtt.Token) {
 	token.Wait()
 	// Check for errors during publishing (More on error reporting https://pkg.go.dev/github.com/eclipse/paho.mqtt.golang#readme-error-handling)
 	if token.Error() != nil {
-		fmt.Printf("Failed to publish to topic")
+		log.Println("Failed to publish to topic")
 		panic(token.Error())
 	} else {
-		fmt.Printf("Published message\n")
+		log.Println("Published message")
 	}
 }
 
 // this callback triggers when a message is received, it then prints the message (in the payload) and topic
 var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	fmt.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
+	log.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
 }
 
 // upon connection to the client, this is called
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
-	fmt.Println("Connected")
+	log.Println("Connected")
 }
 
 // this is called when the connection to the client is lost, it prints "Connection lost" and the corresponding error
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
-	fmt.Printf("Connection lost: %v", err)
+	log.Printf("Connection lost: %v", err)
 }
