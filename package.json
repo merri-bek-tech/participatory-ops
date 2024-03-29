@@ -5,7 +5,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch-frontend": "cd frontend && npm run dev",
     "watch-api": "cd api && nodemon --watch './**/*.go' --signal SIGTERM --exec 'go' run .",
-    "dev": "concurrently \"npm run watch-frontend\" \"npm run watch-api\""
+    "dev": "concurrently \"npm run watch-frontend\" \"npm run watch-api\"",
+    "pickle-gen": "cd paropd; pkl-gen-go config/pkl/GeneratedConfig.pkl"
   },
   "author": "",
   "license": "GPL3",

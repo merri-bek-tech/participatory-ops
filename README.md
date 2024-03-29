@@ -11,6 +11,12 @@ ParOps consists of the following parts:
 
 ## Development
 
+### Dependences
+
+Development on the paropd application requires the use of the Pkl (pickle) configuration language. It can be installed via instructions here:
+
+https://pkl-lang.org/main/current/pkl-cli/index.html#installation
+
 ### Running Locally
 
 To run both frontend and api simultaneously, we use `nodemon` to execute both. This is a nodejs based tool, but you should already have that installed to run the frontend.
