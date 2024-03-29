@@ -7,9 +7,14 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type ComponentDetails struct {
+	HostName string `json:"hostName"`
+}
+
 type Component struct {
-	Uuid      string `json:"uuid"`
-	UpdatedAt int64  `json:"at"`
+	Uuid      string            `json:"uuid"`
+	UpdatedAt int64             `json:"at"`
+	Details   *ComponentDetails `json:"details"`
 }
 
 type ComponentCache map[string]Component
@@ -42,6 +47,11 @@ func OnHeartbeat(heartbeat events.ComponentHeartbeat, cache ComponentCache) {
 			UpdatedAt: heartbeat.At,
 		}
 	}
+}
+
+func HasDetails(uuid string, cache ComponentCache) bool {
+	component, exists := cache[uuid]
+	return exists && component.Details != nil
 }
 
 // PRIVATE
