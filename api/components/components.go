@@ -9,6 +9,10 @@ import (
 func MonitorComponents(cacheData cache.ComponentCache) {
 	comms.MonitorComponents(comms.CommsHandlers{
 		HandleHeartbeat: func(heartbeat events.ComponentHeartbeat) {
-			cache.OnHeartbeat(heartbeat, cacheData)
+			OnHeartbeat(heartbeat, cacheData)
 		}})
+}
+
+func OnHeartbeat(heartbeat events.ComponentHeartbeat, cacheData cache.ComponentCache) {
+	cache.OnHeartbeat(heartbeat, cacheData)
 }

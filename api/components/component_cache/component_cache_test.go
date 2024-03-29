@@ -27,7 +27,7 @@ func TestOnHeartbeatWithNewComponent(t *testing.T) {
 	if cache[heartbeat.Uuid].Uuid != heartbeat.Uuid {
 		t.Error("Expected cache to have the correct component uuid")
 	}
-	if cache[heartbeat.Uuid].At != heartbeat.At {
+	if cache[heartbeat.Uuid].UpdatedAt != heartbeat.At {
 		t.Error("Expected cache to have the correct timestamp")
 	}
 }
@@ -68,7 +68,7 @@ func TestOnHeartbeatWithUpdateOnExistingComponent(t *testing.T) {
 	if len(cache) != 1 {
 		t.Error("Expected cache to have one item")
 	}
-	if cache[heartbeat1.Uuid].At != heartbeat2.At {
+	if cache[heartbeat1.Uuid].UpdatedAt != heartbeat2.At {
 		t.Error("Expected cache to have the updated timestamp")
 	}
 }
@@ -90,7 +90,7 @@ func TestOnHeartbeatWithOlderMessageAboutExistingComponent(t *testing.T) {
 	if len(cache) != 1 {
 		t.Error("Expected cache to have one item")
 	}
-	if cache[heartbeat1.Uuid].At != heartbeat1.At {
+	if cache[heartbeat1.Uuid].UpdatedAt != heartbeat1.At {
 		t.Error("Expected cache to have the original timestamp")
 	}
 }

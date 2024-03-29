@@ -8,8 +8,8 @@ import (
 )
 
 type Component struct {
-	Uuid string `json:"uuid"`
-	At   int64  `json:"at"`
+	Uuid      string `json:"uuid"`
+	UpdatedAt int64  `json:"at"`
 }
 
 type ComponentCache map[string]Component
@@ -36,10 +36,10 @@ func Status(component Component) string {
 
 func OnHeartbeat(heartbeat events.ComponentHeartbeat, cache ComponentCache) {
 	existing, exists := cache[heartbeat.Uuid]
-	if !exists || existing.At < heartbeat.At {
+	if !exists || existing.UpdatedAt < heartbeat.At {
 		cache[heartbeat.Uuid] = Component{
-			Uuid: heartbeat.Uuid,
-			At:   heartbeat.At,
+			Uuid:      heartbeat.Uuid,
+			UpdatedAt: heartbeat.At,
 		}
 	}
 }
@@ -47,5 +47,5 @@ func OnHeartbeat(heartbeat events.ComponentHeartbeat, cache ComponentCache) {
 // PRIVATE
 
 func secondsSinceUpdate(component Component) int64 {
-	return time.Now().Unix() - component.At
+	return time.Now().Unix() - component.UpdatedAt
 }

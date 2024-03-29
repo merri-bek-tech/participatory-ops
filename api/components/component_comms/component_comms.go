@@ -27,8 +27,6 @@ func MonitorComponents(handlers CommsHandlers) {
 	)
 
 	subscribe("components/+", client, handlers)
-
-	fmt.Println("Monitoring components finished")
 }
 
 type Meta struct {
