@@ -7,6 +7,8 @@ import (
 	"strings"
 	"time"
 
+	messages "paropd/messages"
+
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	paho "github.com/eclipse/paho.mqtt.golang"
 )
@@ -14,16 +16,6 @@ import (
 type Client struct {
 	DeviceId string
 	mqtt     paho.Client
-}
-
-type ComponentHeartbeat struct {
-	Uuid string `json:"uuid"`
-	At   int64  `json:"at"`
-}
-
-type Meta struct {
-	Type    string `json:"type"`
-	Version string `json:"version"`
 }
 
 func Connect(deviceId string) *Client {
@@ -54,12 +46,12 @@ func (client *Client) PublishHeartbeat() {
 func transmitHeartbeat(topic string, client mqtt.Client, clientId string) mqtt.Token {
 	log.Println("Publishing heartbeat")
 
-	meta := Meta{
+	meta := messages.Meta{
 		Type:    "ComponentHeartbeat",
 		Version: "1.0",
 	}
 
-	payload := ComponentHeartbeat{
+	payload := messages.ComponentHeartbeat{
 		Uuid: clientId,
 		At:   time.Now().Unix(),
 	}

@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	comms "paropd/comms"
+	"paropd/comms"
 	configs "paropd/config"
 )
 
