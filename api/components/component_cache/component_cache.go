@@ -38,6 +38,8 @@ func WithCache(next HandlerWithComponentCache, cache *ComponentCache) echo.Handl
 }
 
 func Status(component *Component) string {
+	log.Printf("Checking status for %v\n", component)
+
 	status := "unknown"
 	if secondsSince(component.UpdatedAt) < 10 {
 		status = "online"
@@ -55,7 +57,7 @@ func (cache *ComponentCache) OnHeartbeat(heartbeat msg.ComponentHeartbeat) {
 		}
 		cache.gocache.SetDefault(heartbeat.Uuid, &newComponent)
 	} else {
-		existing.(*Component).Uuid = heartbeat.Uuid
+		existing.(*Component).UpdatedAt = heartbeat.At
 	}
 }
 
