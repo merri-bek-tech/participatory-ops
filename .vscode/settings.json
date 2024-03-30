@@ -19,5 +19,5 @@
     "node_modules": true
   },
   "explorerExclude.backup": {},
-  "cSpell.words": ["mergo", "Mqtt", "paropd", "Parops"]
+  "cSpell.words": ["gocache", "gocaches", "mergo", "Mqtt", "paropd", "Parops"]
 }
