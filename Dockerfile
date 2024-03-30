@@ -14,7 +14,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /app/parops-server
 
 # API RUNNER
 FROM ubuntu as runner
-COPY --from=gobuilder /app/api/parops-server /app/parops-server
+COPY --from=gobuilder /app/parops-server /app/parops-server
 COPY --from=vitebuilder /app/dist /app/web
 EXPOSE 1323
 CMD ["/app/parops-server"]
