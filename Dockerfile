@@ -7,8 +7,8 @@ RUN npm install && npm run build
 # API BUILDER
 FROM golang:1.21 as gobuilder
 WORKDIR /app
-
 COPY ./api .
+COPY ./libs .
 RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux go build -o /app/parops-server
 
