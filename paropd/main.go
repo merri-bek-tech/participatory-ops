@@ -73,6 +73,9 @@ func (app *AppData) init() error {
 	app.client = msg.Connect(app.config.Computed.Uuid)
 	app.client.SubscribeDevice(msg.CommsHandlers{
 		HandleHeartbeat: nil,
+		DetailsRequested: func() {
+			log.Println("Received details request")
+		},
 	})
 
 	return nil
@@ -98,7 +101,7 @@ func run(ctx context.Context, app *AppData) error {
 		case <-ctx.Done():
 			return nil
 		case <-time.Tick(defaultTick):
-			app.client.PublishHeartbeat()
+			app.client.PublishMyHeartbeat()
 		}
 	}
 }

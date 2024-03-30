@@ -10,13 +10,15 @@ import (
 	paho "github.com/eclipse/paho.mqtt.golang"
 )
 
+var (
+	AtMostOnce  byte = 0
+	AtLeastOnce byte = 1
+	ExactlyOnce byte = 2
+)
+
 type Client struct {
 	DeviceId string
 	Mqtt     paho.Client
-}
-
-type CommsHandlers struct {
-	HandleHeartbeat func(heartbeat ComponentHeartbeat)
 }
 
 func Connect(deviceId string) *Client {
@@ -38,39 +40,77 @@ func (client *Client) Disconnect() {
 	client.Mqtt.Disconnect(250)
 }
 
-func (client *Client) PublishHeartbeat() {
-	transmitHeartbeat("components/"+client.DeviceId, client.Mqtt, client.DeviceId)
+func (client *Client) PublishMyHeartbeat() {
+	payload := ComponentHeartbeat{
+		Uuid: client.DeviceId,
+		At:   time.Now().Unix(),
+	}
+
+	client.publishHeartbeat(deviceTopic(client.DeviceId), payload)
+}
+
+func (client *Client) PublishDetailsRequested(uuid string) {
+	client.publishDetailsRequested(deviceTopic(uuid))
 }
 
 func (client *Client) SubscribeAllComponents(handlers CommsHandlers) {
-	subscribe("components/+", client.Mqtt, handlers)
+	subscribe(allDevicesTopic(), client.Mqtt, handlers)
 }
 
 func (client *Client) SubscribeDevice(handlers CommsHandlers) {
-	subscribe("components/"+client.DeviceId, client.Mqtt, handlers)
+	subscribe(deviceTopic(client.DeviceId), client.Mqtt, handlers)
 }
 
 // PRIVATE
 
-func transmitHeartbeat(topic string, client paho.Client, clientId string) paho.Token {
+func deviceTopic(uuid string) string {
+	return "components/" + uuid
+}
+
+func allDevicesTopic() string {
+	return "components/+"
+}
+
+func (client *Client) publishHeartbeat(topic string, data ComponentHeartbeat) paho.Token {
 	log.Println("Publishing heartbeat")
 
+	text := encodeHeartbeat(data)
+	return client.Mqtt.Publish(topic, AtMostOnce, false, text)
+}
+
+func (client *Client) publishDetailsRequested(topic string) paho.Token {
+	log.Println("Publishing details requested")
+
+	text := encodeDetailsRequested()
+	return client.Mqtt.Publish(topic, AtMostOnce, false, text)
+}
+
+func encodeHeartbeat(heartbeat ComponentHeartbeat) string {
 	meta := Meta{
 		Type:    "ComponentHeartbeat",
 		Version: "1.0",
 	}
 
-	payload := ComponentHeartbeat{
-		Uuid: clientId,
-		At:   time.Now().Unix(),
+	return encodeMessage(meta, heartbeat)
+}
+
+func encodeDetailsRequested() string {
+	meta := Meta{
+		Type:    "DetailsRequested",
+		Version: "1.0",
 	}
 
+	return encodeMessage(meta, nil)
+}
+
+func encodeMessage(meta Meta, body any) string {
 	metaText := jsonString(meta)
-	payloadText := jsonString(payload)
+	payloadText := ""
+	if body != nil {
+		payloadText = jsonString(body)
+	}
 
-	qos := byte(0) // 0 = at most once, 1 = at least once, 2 = exactly once
-
-	return client.Publish(topic, qos, false, strings.Join([]string{metaText, payloadText}, "|"))
+	return strings.Join([]string{metaText, payloadText}, "|")
 }
 
 func connectClient(host string, port int, username string, password string, clientId string) paho.Client {
@@ -127,7 +167,7 @@ var connectLostHandler paho.ConnectionLostHandler = func(client paho.Client, err
 	log.Printf("Connection lost: %v", err)
 }
 
-func handleHeartbeatMessage(handlers CommsHandlers, _ Meta, contents string) {
+func handleComponentHeartbeatMessage(handlers CommsHandlers, _ Meta, contents string) {
 	if handlers.HandleHeartbeat == nil {
 		return
 	}
@@ -144,10 +184,20 @@ func handleHeartbeatMessage(handlers CommsHandlers, _ Meta, contents string) {
 	handlers.HandleHeartbeat(heartbeat)
 }
 
+func handleDetailsRequestedMessage(handlers CommsHandlers, _ Meta, _ string) {
+	if handlers.DetailsRequested == nil {
+		return
+	}
+
+	handlers.DetailsRequested()
+}
+
 func handleParopsMessage(handlers CommsHandlers, meta Meta, contents string) {
 	switch meta.Type {
 	case "ComponentHeartbeat":
-		handleHeartbeatMessage(handlers, meta, contents)
+		handleComponentHeartbeatMessage(handlers, meta, contents)
+	case "DetailsRequested":
+		handleDetailsRequestedMessage(handlers, meta, contents)
 	default:
 		fmt.Println("Unknown message type: ", meta.Type)
 	}

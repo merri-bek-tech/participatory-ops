@@ -15,26 +15,27 @@ func MonitorComponents(cache *compCache.ComponentCache) {
 	client := msg.Connect(deviceId)
 	handlers := msg.CommsHandlers{
 		HandleHeartbeat: func(heartbeat msg.ComponentHeartbeat) {
-			OnHeartbeat(heartbeat, cache)
+			OnHeartbeat(heartbeat, cache, client)
 		},
 	}
 
 	client.SubscribeAllComponents(handlers)
 }
 
-func OnHeartbeat(heartbeat msg.ComponentHeartbeat, cache *compCache.ComponentCache) {
+func OnHeartbeat(heartbeat msg.ComponentHeartbeat, cache *compCache.ComponentCache, client *msg.Client) {
 	cache.OnHeartbeat(heartbeat)
 
 	component, exists := cache.Get(heartbeat.Uuid)
 	if exists {
 		if component.NeedsDetails(detailsCheckFrequencySeconds) {
-			RequestDetails(component)
+			RequestDetails(component, client)
 		}
 	}
 }
 
-func RequestDetails(component *compCache.Component) {
+func RequestDetails(component *compCache.Component, client *msg.Client) {
 	fmt.Printf("Requesting details for %s\n", component.Uuid)
 
+	client.PublishDetailsRequested(component.Uuid)
 	component.DetailsRequested()
 }

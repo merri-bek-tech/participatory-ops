@@ -9,3 +9,8 @@ type ComponentHeartbeat struct {
 	Uuid string `json:"uuid"`
 	At   int64  `json:"at"`
 }
+
+type CommsHandlers struct {
+	HandleHeartbeat  func(heartbeat ComponentHeartbeat)
+	DetailsRequested func()
+}
