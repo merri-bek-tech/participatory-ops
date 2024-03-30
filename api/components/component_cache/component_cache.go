@@ -2,7 +2,7 @@ package component_cache
 
 import (
 	"cmp"
-	"fmt"
+	"log"
 	"slices"
 	"time"
 
@@ -16,14 +16,10 @@ type ComponentCache struct {
 	gocache *gocaches.Cache
 }
 
-type ComponentDetails struct {
-	HostName string `json:"hostName"`
-}
-
 type Component struct {
-	Uuid               string            `json:"uuid"`
-	UpdatedAt          int64             `json:"at"`
-	Details            *ComponentDetails `json:"details"`
+	Uuid               string                `json:"uuid"`
+	UpdatedAt          int64                 `json:"at"`
+	Details            *msg.ComponentDetails `json:"details"`
 	DetailsRequestedAt int64
 }
 
@@ -90,15 +86,23 @@ func (cache *ComponentCache) Get(uuid string) (*Component, bool) {
 	}
 }
 
-func (component *Component) NeedsDetails(minCheckSeconds int64) bool {
-	fmt.Println("Details last requested at: ", component.DetailsRequestedAt)
+func (cache *ComponentCache) SetDetails(uuid string, details *msg.ComponentDetails) {
+	component, exists := cache.Get(uuid)
+	if exists {
+		component.Details = details
+	} else {
+		log.Printf("Attempted to set details for unknown component: %s\n", uuid)
+	}
+}
 
+func (component *Component) NeedsDetails(minCheckSeconds int64) bool {
+	// log.Println("Details last requested at: ", component.DetailsRequestedAt)
 	return component.Details == nil && secondsSince(component.DetailsRequestedAt) > minCheckSeconds
 }
 
 func (component *Component) DetailsRequested() {
 	component.DetailsRequestedAt = time.Now().Unix()
-	fmt.Printf("detailsRequestedAt updated: %v\n", component)
+	log.Printf("detailsRequestedAt updated: %v\n", component)
 }
 
 // // PRIVATE

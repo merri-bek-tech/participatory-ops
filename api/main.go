@@ -7,11 +7,13 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"parops.libs/msg"
 )
 
 type ComponentStatus struct {
-	Uuid   string `json:"uuid"`
-	Status string `json:"status"`
+	Uuid    string                `json:"uuid"`
+	Status  string                `json:"status"`
+	Details *msg.ComponentDetails `json:"details"`
 }
 
 func main() {
@@ -40,8 +42,9 @@ func getInbox(c echo.Context, cache *compCache.ComponentCache) error {
 
 	for _, cacheItem := range components {
 		statuses = append(statuses, ComponentStatus{
-			Uuid:   cacheItem.Uuid,
-			Status: compCache.Status(cacheItem),
+			Uuid:    cacheItem.Uuid,
+			Status:  compCache.Status(cacheItem),
+			Details: cacheItem.Details,
 		})
 	}
 

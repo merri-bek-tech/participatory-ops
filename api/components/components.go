@@ -1,7 +1,6 @@
 package components
 
 import (
-	"fmt"
 	"log"
 	compCache "parops/components/component_cache"
 
@@ -20,6 +19,7 @@ func MonitorComponents(cache *compCache.ComponentCache) {
 		},
 		ComponentDetails: func(details msg.ComponentDetails) {
 			log.Printf("Received details for %s: %s\n", details.Uuid, details.HostName)
+			cache.SetDetails(details.Uuid, &details)
 		},
 	}
 
@@ -38,7 +38,7 @@ func OnHeartbeat(heartbeat msg.ComponentHeartbeat, cache *compCache.ComponentCac
 }
 
 func RequestDetails(component *compCache.Component, client *msg.Client) {
-	fmt.Printf("Requesting details for %s\n", component.Uuid)
+	log.Printf("Requesting details for %s\n", component.Uuid)
 
 	client.PublishDetailsRequested(component.Uuid)
 	component.DetailsRequested()
