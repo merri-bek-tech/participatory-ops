@@ -1,7 +1,7 @@
 package component_cache
 
 import (
-	events "parops/components/component_events"
+	"parops/messages"
 	"testing"
 )
 
@@ -14,7 +14,7 @@ func TestCacheStartsEmpty(t *testing.T) {
 
 func TestOnHeartbeatWithNewComponent(t *testing.T) {
 	cache := NewComponentCache()
-	heartbeat := events.ComponentHeartbeat{
+	heartbeat := messages.ComponentHeartbeat{
 		Uuid: "f08b7172-36d8-447f-85e1-41403d2730c8",
 		At:   1234567890,
 	}
@@ -41,11 +41,11 @@ func TestOnHeartbeatWithNewComponent(t *testing.T) {
 
 func TestOnHeartbeatWithSecondNewComponent(t *testing.T) {
 	cache := NewComponentCache()
-	heartbeat1 := events.ComponentHeartbeat{
+	heartbeat1 := messages.ComponentHeartbeat{
 		Uuid: "aaa",
 		At:   1234567890,
 	}
-	heartbeat2 := events.ComponentHeartbeat{
+	heartbeat2 := messages.ComponentHeartbeat{
 		Uuid: "bbb",
 		At:   1234567891,
 	}
@@ -60,11 +60,11 @@ func TestOnHeartbeatWithSecondNewComponent(t *testing.T) {
 
 func TestOnHeartbeatWithUpdateOnExistingComponent(t *testing.T) {
 	cache := NewComponentCache()
-	heartbeat1 := events.ComponentHeartbeat{
+	heartbeat1 := messages.ComponentHeartbeat{
 		Uuid: "aaa",
 		At:   1234567890,
 	}
-	heartbeat2 := events.ComponentHeartbeat{
+	heartbeat2 := messages.ComponentHeartbeat{
 		Uuid: "aaa",
 		At:   1234567891,
 	}
@@ -88,11 +88,11 @@ func TestOnHeartbeatWithUpdateOnExistingComponent(t *testing.T) {
 
 func TestOnHeartbeatWithOlderMessageAboutExistingComponent(t *testing.T) {
 	cache := NewComponentCache()
-	heartbeat1 := events.ComponentHeartbeat{
+	heartbeat1 := messages.ComponentHeartbeat{
 		Uuid: "aaa",
 		At:   1234567891,
 	}
-	heartbeat2 := events.ComponentHeartbeat{
+	heartbeat2 := messages.ComponentHeartbeat{
 		Uuid: "aaa",
 		At:   1234567890,
 	}
@@ -116,8 +116,8 @@ func TestOnHeartbeatWithOlderMessageAboutExistingComponent(t *testing.T) {
 
 func TestItemListReturnsAnArrayOfItems(t *testing.T) {
 	cache := NewComponentCache()
-	cache.OnHeartbeat(events.ComponentHeartbeat{Uuid: "aaa", At: 1234567891})
-	cache.OnHeartbeat(events.ComponentHeartbeat{Uuid: "bbb", At: 1234567891})
+	cache.OnHeartbeat(messages.ComponentHeartbeat{Uuid: "aaa", At: 1234567891})
+	cache.OnHeartbeat(messages.ComponentHeartbeat{Uuid: "bbb", At: 1234567891})
 
 	items := cache.ItemList()
 

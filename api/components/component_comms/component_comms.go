@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	events "parops/components/component_events"
+	"parops/messages"
 	"strings"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -12,7 +12,7 @@ import (
 )
 
 type CommsHandlers struct {
-	HandleHeartbeat func(heartbeat events.ComponentHeartbeat)
+	HandleHeartbeat func(heartbeat messages.ComponentHeartbeat)
 }
 
 func MonitorComponents(handlers CommsHandlers) {
@@ -29,17 +29,12 @@ func MonitorComponents(handlers CommsHandlers) {
 	subscribe("components/+", client, handlers)
 }
 
-type Meta struct {
-	Type    string `json:"type"`
-	Version string `json:"version"`
-}
-
 // PRIVATE
 
-func handleHeartbeatMessage(handlers CommsHandlers, _ Meta, contents string) {
+func handleHeartbeatMessage(handlers CommsHandlers, _ messages.Meta, contents string) {
 	fmt.Println("Received heartbeat message: ", contents)
 
-	var heartbeat events.ComponentHeartbeat
+	var heartbeat messages.ComponentHeartbeat
 	err := json.Unmarshal([]byte(contents), &heartbeat)
 	if err != nil {
 		fmt.Println("Failed to parse heartbeat: ", err)
@@ -49,7 +44,7 @@ func handleHeartbeatMessage(handlers CommsHandlers, _ Meta, contents string) {
 	handlers.HandleHeartbeat(heartbeat)
 }
 
-func handleParopsMessage(handlers CommsHandlers, meta Meta, contents string) {
+func handleParopsMessage(handlers CommsHandlers, meta messages.Meta, contents string) {
 	switch meta.Type {
 	case "ComponentHeartbeat":
 		handleHeartbeatMessage(handlers, meta, contents)
@@ -75,7 +70,7 @@ func handleMqttMessage(handlers CommsHandlers, client mqtt.Client, msg mqtt.Mess
 	contentsString := payloadParts[1]
 
 	// parse Meta from the meta string
-	var meta Meta
+	var meta messages.Meta
 	err := json.Unmarshal([]byte(metaString), &meta)
 	if err != nil {
 		fmt.Println("Failed to parse meta")

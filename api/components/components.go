@@ -4,19 +4,19 @@ import (
 	"fmt"
 	compCache "parops/components/component_cache"
 	comms "parops/components/component_comms"
-	events "parops/components/component_events"
+	"parops/messages"
 )
 
 var detailsCheckFrequencySeconds int64 = 20
 
 func MonitorComponents(cache *compCache.ComponentCache) {
 	comms.MonitorComponents(comms.CommsHandlers{
-		HandleHeartbeat: func(heartbeat events.ComponentHeartbeat) {
+		HandleHeartbeat: func(heartbeat messages.ComponentHeartbeat) {
 			OnHeartbeat(heartbeat, cache)
 		}})
 }
 
-func OnHeartbeat(heartbeat events.ComponentHeartbeat, cache *compCache.ComponentCache) {
+func OnHeartbeat(heartbeat messages.ComponentHeartbeat, cache *compCache.ComponentCache) {
 	cache.OnHeartbeat(heartbeat)
 
 	component, exists := cache.Get(heartbeat.Uuid)

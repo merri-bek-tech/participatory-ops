@@ -3,9 +3,10 @@ package component_cache
 import (
 	"cmp"
 	"fmt"
-	events "parops/components/component_events"
 	"slices"
 	"time"
+
+	"parops/messages"
 
 	"github.com/labstack/echo/v4"
 	gocaches "github.com/patrickmn/go-cache"
@@ -48,7 +49,7 @@ func Status(component *Component) string {
 	return status
 }
 
-func (cache *ComponentCache) OnHeartbeat(heartbeat events.ComponentHeartbeat) {
+func (cache *ComponentCache) OnHeartbeat(heartbeat messages.ComponentHeartbeat) {
 	existing, exists := cache.gocache.Get(heartbeat.Uuid)
 
 	if !exists {
