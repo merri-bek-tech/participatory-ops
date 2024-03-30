@@ -2,6 +2,7 @@ package component_cache
 
 import (
 	"cmp"
+	"fmt"
 	events "parops/components/component_events"
 	"slices"
 	"time"
@@ -81,24 +82,23 @@ func (cache *ComponentCache) ItemList() []*Component {
 
 func (cache *ComponentCache) Get(uuid string) (*Component, bool) {
 	component, exists := cache.gocache.Get(uuid)
-	return component.(*Component), exists
+	if !exists {
+		return nil, false
+	} else {
+		return component.(*Component), true
+	}
 }
 
-// func (cache ComponentCache) FetchComponent(uuid string) (*Component, bool) {
-// 	component, exists := cache[uuid]
-// 	return &component, exists
-// }
+func (component *Component) NeedsDetails(minCheckSeconds int64) bool {
+	fmt.Println("Details last requested at: ", component.DetailsRequestedAt)
 
-// func (component *Component) NeedsDetails(minCheckSeconds int64) bool {
-// 	fmt.Println("Details last requested at: ", component.DetailsRequestedAt)
+	return component.Details == nil && secondsSince(component.DetailsRequestedAt) > minCheckSeconds
+}
 
-// 	return component.Details == nil && secondsSince(component.DetailsRequestedAt) > minCheckSeconds
-// }
-
-// func (component *Component) DetailsRequested() {
-// 	component.DetailsRequestedAt = time.Now().Unix()
-// 	fmt.Printf("detailsRequestedAt updated: %v\n", component)
-// }
+func (component *Component) DetailsRequested() {
+	component.DetailsRequestedAt = time.Now().Unix()
+	fmt.Printf("detailsRequestedAt updated: %v\n", component)
+}
 
 // // PRIVATE
 
