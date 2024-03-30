@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"strings"
 
-	"parops.libs/paroplib/messages"
+	"parops.libs/msg"
 
-	mqtt "github.com/eclipse/paho.mqtt.golang"
+	paho "github.com/eclipse/paho.mqtt.golang"
 	uuid "github.com/google/uuid"
 )
 
 type CommsHandlers struct {
-	HandleHeartbeat func(heartbeat messages.ComponentHeartbeat)
+	HandleHeartbeat func(heartbeat msg.ComponentHeartbeat)
 }
 
 func MonitorComponents(handlers CommsHandlers) {
@@ -32,10 +32,10 @@ func MonitorComponents(handlers CommsHandlers) {
 
 // PRIVATE
 
-func handleHeartbeatMessage(handlers CommsHandlers, _ messages.Meta, contents string) {
+func handleHeartbeatMessage(handlers CommsHandlers, _ msg.Meta, contents string) {
 	fmt.Println("Received heartbeat message: ", contents)
 
-	var heartbeat messages.ComponentHeartbeat
+	var heartbeat msg.ComponentHeartbeat
 	err := json.Unmarshal([]byte(contents), &heartbeat)
 	if err != nil {
 		fmt.Println("Failed to parse heartbeat: ", err)
@@ -45,7 +45,7 @@ func handleHeartbeatMessage(handlers CommsHandlers, _ messages.Meta, contents st
 	handlers.HandleHeartbeat(heartbeat)
 }
 
-func handleParopsMessage(handlers CommsHandlers, meta messages.Meta, contents string) {
+func handleParopsMessage(handlers CommsHandlers, meta msg.Meta, contents string) {
 	switch meta.Type {
 	case "ComponentHeartbeat":
 		handleHeartbeatMessage(handlers, meta, contents)
@@ -54,11 +54,11 @@ func handleParopsMessage(handlers CommsHandlers, meta messages.Meta, contents st
 	}
 }
 
-func handleMqttMessage(handlers CommsHandlers, client mqtt.Client, msg mqtt.Message) {
+func handleMqttMessage(handlers CommsHandlers, client paho.Client, message paho.Message) {
 	//fmt.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
 
 	// split the message payload by |
-	payload := string(msg.Payload())
+	payload := string(message.Payload())
 	payloadParts := strings.Split(payload, "|")
 
 	if len(payloadParts) != 2 {
@@ -71,7 +71,7 @@ func handleMqttMessage(handlers CommsHandlers, client mqtt.Client, msg mqtt.Mess
 	contentsString := payloadParts[1]
 
 	// parse Meta from the meta string
-	var meta messages.Meta
+	var meta msg.Meta
 	err := json.Unmarshal([]byte(metaString), &meta)
 	if err != nil {
 		fmt.Println("Failed to parse meta")
@@ -81,8 +81,8 @@ func handleMqttMessage(handlers CommsHandlers, client mqtt.Client, msg mqtt.Mess
 	handleParopsMessage(handlers, meta, contentsString)
 }
 
-func subscribe(topic string, client mqtt.Client, handlers CommsHandlers) {
-	handler := func(client mqtt.Client, msg mqtt.Message) {
+func subscribe(topic string, client paho.Client, handlers CommsHandlers) {
+	handler := func(client paho.Client, msg paho.Message) {
 		handleMqttMessage(handlers, client, msg)
 	}
 
@@ -97,8 +97,8 @@ func subscribe(topic string, client mqtt.Client, handlers CommsHandlers) {
 	fmt.Printf("Subscribed to topic: %s\n", topic)
 }
 
-func connectClient(host string, port int, username string, password string, clientId string) mqtt.Client {
-	opts := mqtt.NewClientOptions()
+func connectClient(host string, port int, username string, password string, clientId string) paho.Client {
+	opts := paho.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tls://%s:%d", host, port))
 	opts.SetClientID(clientId) // set a name as you desire
 	opts.SetUsername(username) // these are the credentials that you declare for your cluster (see readme)
@@ -110,7 +110,7 @@ func connectClient(host string, port int, username string, password string, clie
 	// opts.OnConnect = connectHandler
 	// opts.OnConnectionLost = connectLostHandler
 	// create the client using the options above
-	client := mqtt.NewClient(opts)
+	client := paho.NewClient(opts)
 	// throw an error if the connection isn't successfull
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())

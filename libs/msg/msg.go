@@ -1,4 +1,4 @@
-package comms
+package msg
 
 import (
 	"encoding/json"
@@ -7,9 +7,6 @@ import (
 	"strings"
 	"time"
 
-	messages "parops.libs/paroplib/messages"
-
-	mqtt "github.com/eclipse/paho.mqtt.golang"
 	paho "github.com/eclipse/paho.mqtt.golang"
 )
 
@@ -43,15 +40,15 @@ func (client *Client) PublishHeartbeat() {
 
 // PRIVATE
 
-func transmitHeartbeat(topic string, client mqtt.Client, clientId string) mqtt.Token {
+func transmitHeartbeat(topic string, client paho.Client, clientId string) paho.Token {
 	log.Println("Publishing heartbeat")
 
-	meta := messages.Meta{
+	meta := Meta{
 		Type:    "ComponentHeartbeat",
 		Version: "1.0",
 	}
 
-	payload := messages.ComponentHeartbeat{
+	payload := ComponentHeartbeat{
 		Uuid: clientId,
 		At:   time.Now().Unix(),
 	}
@@ -92,7 +89,7 @@ func jsonString(input any) string {
 	return string(output)
 }
 
-func handleResult(token mqtt.Token) {
+func handleResult(token paho.Token) {
 	token.Wait()
 	// Check for errors during publishing (More on error reporting https://pkg.go.dev/github.com/eclipse/paho.mqtt.golang#readme-error-handling)
 	if token.Error() != nil {
@@ -104,16 +101,16 @@ func handleResult(token mqtt.Token) {
 }
 
 // this callback triggers when a message is received, it then prints the message (in the payload) and topic
-var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
+var messagePubHandler paho.MessageHandler = func(client paho.Client, msg paho.Message) {
 	log.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
 }
 
 // upon connection to the client, this is called
-var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
+var connectHandler paho.OnConnectHandler = func(client paho.Client) {
 	log.Println("Connected")
 }
 
 // this is called when the connection to the client is lost, it prints "Connection lost" and the corresponding error
-var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
+var connectLostHandler paho.ConnectionLostHandler = func(client paho.Client, err error) {
 	log.Printf("Connection lost: %v", err)
 }

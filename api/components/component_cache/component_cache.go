@@ -6,7 +6,7 @@ import (
 	"slices"
 	"time"
 
-	"parops.libs/paroplib/messages"
+	"parops.libs/msg"
 
 	"github.com/labstack/echo/v4"
 	gocaches "github.com/patrickmn/go-cache"
@@ -49,7 +49,7 @@ func Status(component *Component) string {
 	return status
 }
 
-func (cache *ComponentCache) OnHeartbeat(heartbeat messages.ComponentHeartbeat) {
+func (cache *ComponentCache) OnHeartbeat(heartbeat msg.ComponentHeartbeat) {
 	existing, exists := cache.gocache.Get(heartbeat.Uuid)
 
 	if !exists {

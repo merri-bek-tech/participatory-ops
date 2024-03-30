@@ -10,15 +10,16 @@ import (
 	"syscall"
 	"time"
 
-	"paropd/comms"
 	configs "paropd/config"
+
+	"parops.libs/msg"
 )
 
 const defaultTick = 3 * time.Second
 
 type AppData struct {
 	config *configs.Config
-	client *comms.Client
+	client *msg.Client
 }
 
 func main() {
@@ -69,7 +70,7 @@ func (app *AppData) init() error {
 
 	log.Println("Initializing app")
 	app.config = configs.LoadConfig(true)
-	app.client = comms.Connect(app.config.Computed.Uuid)
+	app.client = msg.Connect(app.config.Computed.Uuid)
 
 	return nil
 }

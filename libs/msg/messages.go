@@ -1,4 +1,4 @@
-package messages
+package msg
 
 type Meta struct {
 	Type    string `json:"type"`
