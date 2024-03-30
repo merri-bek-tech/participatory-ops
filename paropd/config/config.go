@@ -60,20 +60,27 @@ func readExistingComputedConfig(filePath string) *computed.ComputedConfig {
 }
 
 func recomputeComputedConfig(existing *computed.ComputedConfig) *computed.ComputedConfig {
-	keep := computed.ComputedConfig{}
-	if existing != nil && existing.Uuid != "" {
-		keep.Uuid = existing.Uuid
-	}
-
 	changed := computed.ComputedConfig{
-		Uuid:     keep.Uuid,
-		HostName: "dummyhost",
-	}
-	if changed.Uuid == "" {
-		changed.Uuid = uuid.New().String()
+		HostName: hostnameOrDefault(""),
 	}
 
+	changed.Uuid = getUuid(existing)
 	return &changed
+}
+
+func hostnameOrDefault(defaultHostname string) string {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return defaultHostname
+	}
+	return hostname
+}
+
+func getUuid(existing *computed.ComputedConfig) string {
+	if existing != nil && existing.Uuid != "" {
+		return existing.Uuid
+	}
+	return uuid.New().String()
 }
 
 func writeComputedConfig(filePath string, data *computed.ComputedConfig) {
