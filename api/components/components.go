@@ -2,9 +2,9 @@ package components
 
 import (
 	"fmt"
+	"parops.libs/messages"
 	compCache "parops/components/component_cache"
 	comms "parops/components/component_comms"
-	"parops/messages"
 )
 
 var detailsCheckFrequencySeconds int64 = 20

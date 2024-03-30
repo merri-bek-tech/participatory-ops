@@ -1,8 +1,9 @@
 package component_cache
 
 import (
-	"parops/messages"
 	"testing"
+
+	"parops.libs/messages"
 )
 
 func TestCacheStartsEmpty(t *testing.T) {

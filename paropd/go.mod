@@ -2,6 +2,8 @@ module paropd
 
 go 1.21.0
 
+replace parops.libs/messages => ../libs/messages
+
 require (
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/apple/pkl-go v0.6.0 // indirect
@@ -13,4 +15,5 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
+	parops.libs/messages v0.0.0-00010101000000-000000000000
 )

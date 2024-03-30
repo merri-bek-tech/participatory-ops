@@ -6,7 +6,7 @@ import (
 	"slices"
 	"time"
 
-	"parops/messages"
+	"parops.libs/messages"
 
 	"github.com/labstack/echo/v4"
 	gocaches "github.com/patrickmn/go-cache"
