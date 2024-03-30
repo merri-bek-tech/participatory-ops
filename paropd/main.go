@@ -109,6 +109,6 @@ func (app *AppData) onDetailsRequested() {
 
 	app.client.PublishDetails(app.config.Computed.Uuid, msg.ComponentDetails{
 		Uuid:     app.config.Computed.Uuid,
-		HostName: "XXXXXX",
+		HostName: app.config.Computed.HostName,
 	})
 }

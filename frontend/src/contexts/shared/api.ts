@@ -1,4 +1,4 @@
-import { UnknownComponent } from "./types"
+import { ComponentStatus } from "./types"
 
 const defaultHeaders = {
   "Content-Type": "application/json",
@@ -18,13 +18,13 @@ class Api {
     console.log("url", this.base_url)
   }
 
-  inbox(): Promise<UnknownComponent[]> {
+  inbox(): Promise<ComponentStatus[]> {
     return fetch(`${this.base_url}/inbox`, {
       method: "GET",
       headers: defaultHeaders,
     })
       .then((response: Response) => response.json())
-      .then((json: any) => json as UnknownComponent[])
+      .then((json: any) => json as ComponentStatus[])
   }
 }
 

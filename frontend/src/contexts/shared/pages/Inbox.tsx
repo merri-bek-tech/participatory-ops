@@ -1,6 +1,6 @@
 import { Box, Grid, GridItem, Heading } from "@chakra-ui/react"
-import UnknownComponentCard from "../components/UnknownComponentCard"
-import { UnknownComponent } from "../types"
+import ComponentStatusCard from "../components/ComponentStatusCard"
+import { ComponentStatus } from "../types"
 import Api from "../api"
 import { useEffect, useState } from "react"
 import { useInterval } from "usehooks-ts"
@@ -8,7 +8,7 @@ import { useInterval } from "usehooks-ts"
 const api = new Api()
 
 export default function Inbox() {
-  const [components, setComponents] = useState<UnknownComponent[]>([])
+  const [components, setComponents] = useState<ComponentStatus[]>([])
 
   const pollApi = () => {
     api.inbox().then((data) => {
@@ -26,7 +26,7 @@ export default function Inbox() {
       <Grid templateColumns={["repeat(1, 1fr)", "repeat(1, 1fr)", "repeat(2, 1fr)"]} gap={4} mt={2}>
         {components.map((component) => (
           <GridItem key={component.uuid}>
-            <UnknownComponentCard {...component} />
+            <ComponentStatusCard {...component} />
           </GridItem>
         ))}
       </Grid>

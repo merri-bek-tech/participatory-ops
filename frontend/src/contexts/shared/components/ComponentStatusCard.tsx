@@ -1,17 +1,19 @@
 import { Card, CardBody, CardHeader, Heading, Table, TableContainer, Tbody, Td, Text, Th, Tr, useColorModeValue } from "@chakra-ui/react"
-import { UnknownComponent } from "../types"
+import { ComponentStatus } from "../types"
 
-export default function UnknownComponentCard({ status, uuid }: UnknownComponent) {
+export default function ComponentStatusCard({ status, uuid, details }: ComponentStatus) {
   const colors = {
     online: "green." + useColorModeValue("300", "600"),
     offline: "gray." + useColorModeValue("200", "500"),
   }
 
+  const hostName = details?.hostName || "Unknown Component"
+
   return (
     <Card>
       <CardHeader bgColor={colors[status]} borderTopRadius={"inherit"}>
         <Heading as="h3" fontSize="lg">
-          Unknown Component
+          {hostName}
         </Heading>
         <Text fontSize="sm">{status}</Text>
       </CardHeader>
