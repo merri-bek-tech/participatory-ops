@@ -12,7 +12,7 @@ import (
 
 type Client struct {
 	DeviceId string
-	mqtt     paho.Client
+	Mqtt     paho.Client
 }
 
 func Connect(deviceId string) *Client {
@@ -26,16 +26,16 @@ func Connect(deviceId string) *Client {
 
 	return &Client{
 		DeviceId: deviceId,
-		mqtt:     client,
+		Mqtt:     client,
 	}
 }
 
 func (client *Client) Disconnect() {
-	client.mqtt.Disconnect(250)
+	client.Mqtt.Disconnect(250)
 }
 
 func (client *Client) PublishHeartbeat() {
-	transmitHeartbeat("components/"+client.DeviceId, client.mqtt, client.DeviceId)
+	transmitHeartbeat("components/"+client.DeviceId, client.Mqtt, client.DeviceId)
 }
 
 // PRIVATE

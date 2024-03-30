@@ -1,7 +1,6 @@
 package component_comms
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -17,17 +16,10 @@ type CommsHandlers struct {
 }
 
 func MonitorComponents(handlers CommsHandlers) {
-	clientId := "api-" + uuid.New().String()
+	deviceId := "api-" + uuid.New().String()
+	client := msg.Connect(deviceId)
 
-	client := connectClient(
-		"82e12caef57c4c8288d08fe23854c097.s1.eu.hivemq.cloud",
-		8883,
-		"paropd",
-		"be9eiQuo",
-		clientId,
-	)
-
-	subscribe("components/+", client, handlers)
+	subscribe("components/+", client.Mqtt, handlers)
 }
 
 // PRIVATE
@@ -95,26 +87,4 @@ func subscribe(topic string, client paho.Client, handlers CommsHandlers) {
 		panic(token.Error())
 	}
 	fmt.Printf("Subscribed to topic: %s\n", topic)
-}
-
-func connectClient(host string, port int, username string, password string, clientId string) paho.Client {
-	opts := paho.NewClientOptions()
-	opts.AddBroker(fmt.Sprintf("tls://%s:%d", host, port))
-	opts.SetClientID(clientId) // set a name as you desire
-	opts.SetUsername(username) // these are the credentials that you declare for your cluster (see readme)
-	opts.SetPassword(password)
-	opts.SetTLSConfig(&tls.Config{InsecureSkipVerify: true})
-
-	// (optionally) configure callback handlers that get called on certain events
-	// opts.SetDefaultPublishHandler(messagePubHandler)
-	// opts.OnConnect = connectHandler
-	// opts.OnConnectionLost = connectLostHandler
-	// create the client using the options above
-	client := paho.NewClient(opts)
-	// throw an error if the connection isn't successfull
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		panic(token.Error())
-	}
-
-	return client
 }
