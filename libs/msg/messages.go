@@ -10,7 +10,13 @@ type ComponentHeartbeat struct {
 	At   int64  `json:"at"`
 }
 
+type ComponentDetails struct {
+	Uuid     string `json:"uuid"`
+	HostName string `json:"hostName"`
+}
+
 type CommsHandlers struct {
 	HandleHeartbeat  func(heartbeat ComponentHeartbeat)
 	DetailsRequested func()
+	ComponentDetails func(details ComponentDetails)
 }

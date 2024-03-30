@@ -72,10 +72,8 @@ func (app *AppData) init() error {
 	app.config = configs.LoadConfig(true)
 	app.client = msg.Connect(app.config.Computed.Uuid)
 	app.client.SubscribeDevice(msg.CommsHandlers{
-		HandleHeartbeat: nil,
-		DetailsRequested: func() {
-			log.Println("Received details request")
-		},
+		HandleHeartbeat:  nil,
+		DetailsRequested: func() { app.onDetailsRequested() },
 	})
 
 	return nil
@@ -104,4 +102,13 @@ func run(ctx context.Context, app *AppData) error {
 			app.client.PublishMyHeartbeat()
 		}
 	}
+}
+
+func (app *AppData) onDetailsRequested() {
+	log.Println("Details requested")
+
+	app.client.PublishDetails(app.config.Computed.Uuid, msg.ComponentDetails{
+		Uuid:     app.config.Computed.Uuid,
+		HostName: "XXXXXX",
+	})
 }

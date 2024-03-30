@@ -53,6 +53,11 @@ func (client *Client) PublishDetailsRequested(uuid string) {
 	client.publishDetailsRequested(deviceTopic(uuid))
 }
 
+func (client *Client) PublishDetails(uuid string, details ComponentDetails) {
+	text := encodeComponentDetails(details)
+	client.Mqtt.Publish(deviceTopic(uuid), AtMostOnce, false, text)
+}
+
 func (client *Client) SubscribeAllComponents(handlers CommsHandlers) {
 	subscribe(allDevicesTopic(), client.Mqtt, handlers)
 }
@@ -101,6 +106,15 @@ func encodeDetailsRequested() string {
 	}
 
 	return encodeMessage(meta, nil)
+}
+
+func encodeComponentDetails(details ComponentDetails) string {
+	meta := Meta{
+		Type:    "ComponentDetails",
+		Version: "1.0",
+	}
+
+	return encodeMessage(meta, details)
 }
 
 func encodeMessage(meta Meta, body any) string {
@@ -172,12 +186,12 @@ func handleComponentHeartbeatMessage(handlers CommsHandlers, _ Meta, contents st
 		return
 	}
 
-	fmt.Println("Received heartbeat message: ", contents)
+	log.Println("Received heartbeat message: ", contents)
 
 	var heartbeat ComponentHeartbeat
 	err := json.Unmarshal([]byte(contents), &heartbeat)
 	if err != nil {
-		fmt.Println("Failed to parse heartbeat: ", err)
+		log.Println("Failed to parse heartbeat: ", err)
 		return
 	}
 
@@ -192,26 +206,43 @@ func handleDetailsRequestedMessage(handlers CommsHandlers, _ Meta, _ string) {
 	handlers.DetailsRequested()
 }
 
+func handleComponentDetailsMessage(handlers CommsHandlers, _ Meta, contents string) {
+	if handlers.ComponentDetails == nil {
+		return
+	}
+
+	var details ComponentDetails
+	err := json.Unmarshal([]byte(contents), &details)
+	if err != nil {
+		log.Println("Failed to parse ComponentDetails: ", err)
+		return
+	}
+
+	handlers.ComponentDetails(details)
+}
+
 func handleParopsMessage(handlers CommsHandlers, meta Meta, contents string) {
 	switch meta.Type {
 	case "ComponentHeartbeat":
 		handleComponentHeartbeatMessage(handlers, meta, contents)
 	case "DetailsRequested":
 		handleDetailsRequestedMessage(handlers, meta, contents)
+	case "ComponentDetails":
+		handleComponentDetailsMessage(handlers, meta, contents)
 	default:
-		fmt.Println("Unknown message type: ", meta.Type)
+		log.Println("Unknown message type: ", meta.Type)
 	}
 }
 
 func handleMqttMessage(handlers CommsHandlers, message paho.Message) {
-	//fmt.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
+	//log.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
 
 	// split the message payload by |
 	payload := string(message.Payload())
 	payloadParts := strings.Split(payload, "|")
 
 	if len(payloadParts) != 2 {
-		fmt.Println("Invalid message format")
+		log.Println("Invalid message format")
 		return
 	}
 
@@ -223,7 +254,7 @@ func handleMqttMessage(handlers CommsHandlers, message paho.Message) {
 	var meta Meta
 	err := json.Unmarshal([]byte(metaString), &meta)
 	if err != nil {
-		fmt.Println("Failed to parse meta")
+		log.Println("Failed to parse meta")
 		return
 	}
 
@@ -240,8 +271,8 @@ func subscribe(topic string, client paho.Client, handlers CommsHandlers) {
 	token.Wait()
 	// Check for errors during subscribe (More on error reporting https://pkg.go.dev/github.com/eclipse/paho.mqtt.golang#readme-error-handling)
 	if token.Error() != nil {
-		fmt.Print("Failed to subscribe to topic\n")
+		log.Print("Failed to subscribe to topic\n")
 		panic(token.Error())
 	}
-	fmt.Printf("Subscribed to topic: %s\n", topic)
+	log.Printf("Subscribed to topic: %s\n", topic)
 }

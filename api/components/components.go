@@ -2,6 +2,7 @@ package components
 
 import (
 	"fmt"
+	"log"
 	compCache "parops/components/component_cache"
 
 	"github.com/google/uuid"
@@ -16,6 +17,9 @@ func MonitorComponents(cache *compCache.ComponentCache) {
 	handlers := msg.CommsHandlers{
 		HandleHeartbeat: func(heartbeat msg.ComponentHeartbeat) {
 			OnHeartbeat(heartbeat, cache, client)
+		},
+		ComponentDetails: func(details msg.ComponentDetails) {
+			log.Printf("Received details for %s: %s\n", details.Uuid, details.HostName)
 		},
 	}
 
