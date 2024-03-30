@@ -15,6 +15,10 @@ type Client struct {
 	Mqtt     paho.Client
 }
 
+type CommsHandlers struct {
+	HandleHeartbeat func(heartbeat ComponentHeartbeat)
+}
+
 func Connect(deviceId string) *Client {
 	client := connectClient(
 		"82e12caef57c4c8288d08fe23854c097.s1.eu.hivemq.cloud",
@@ -36,6 +40,10 @@ func (client *Client) Disconnect() {
 
 func (client *Client) PublishHeartbeat() {
 	transmitHeartbeat("components/"+client.DeviceId, client.Mqtt, client.DeviceId)
+}
+
+func (client *Client) Subscribe(topic string, handlers CommsHandlers) {
+	subscribe(topic, client.Mqtt, handlers)
 }
 
 // PRIVATE
@@ -113,4 +121,69 @@ var connectHandler paho.OnConnectHandler = func(client paho.Client) {
 // this is called when the connection to the client is lost, it prints "Connection lost" and the corresponding error
 var connectLostHandler paho.ConnectionLostHandler = func(client paho.Client, err error) {
 	log.Printf("Connection lost: %v", err)
+}
+
+func handleHeartbeatMessage(handlers CommsHandlers, _ Meta, contents string) {
+	fmt.Println("Received heartbeat message: ", contents)
+
+	var heartbeat ComponentHeartbeat
+	err := json.Unmarshal([]byte(contents), &heartbeat)
+	if err != nil {
+		fmt.Println("Failed to parse heartbeat: ", err)
+		return
+	}
+
+	handlers.HandleHeartbeat(heartbeat)
+}
+
+func handleParopsMessage(handlers CommsHandlers, meta Meta, contents string) {
+	switch meta.Type {
+	case "ComponentHeartbeat":
+		handleHeartbeatMessage(handlers, meta, contents)
+	default:
+		fmt.Println("Unknown message type: ", meta.Type)
+	}
+}
+
+func handleMqttMessage(handlers CommsHandlers, message paho.Message) {
+	//fmt.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
+
+	// split the message payload by |
+	payload := string(message.Payload())
+	payloadParts := strings.Split(payload, "|")
+
+	if len(payloadParts) != 2 {
+		fmt.Println("Invalid message format")
+		return
+	}
+
+	// get the meta and the contents from the payloadParts
+	metaString := payloadParts[0]
+	contentsString := payloadParts[1]
+
+	// parse Meta from the meta string
+	var meta Meta
+	err := json.Unmarshal([]byte(metaString), &meta)
+	if err != nil {
+		fmt.Println("Failed to parse meta")
+		return
+	}
+
+	handleParopsMessage(handlers, meta, contentsString)
+}
+
+func subscribe(topic string, client paho.Client, handlers CommsHandlers) {
+	handler := func(client paho.Client, message paho.Message) {
+		handleMqttMessage(handlers, message)
+	}
+
+	// subscribe to the same topic, that was published to, to receive the messages
+	token := client.Subscribe(topic, 1, handler)
+	token.Wait()
+	// Check for errors during subscribe (More on error reporting https://pkg.go.dev/github.com/eclipse/paho.mqtt.golang#readme-error-handling)
+	if token.Error() != nil {
+		fmt.Print("Failed to subscribe to topic\n")
+		panic(token.Error())
+	}
+	fmt.Printf("Subscribed to topic: %s\n", topic)
 }
