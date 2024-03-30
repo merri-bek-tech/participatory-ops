@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	messages "parops.libs/messages"
+	messages "parops.libs/paroplib/messages"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	paho "github.com/eclipse/paho.mqtt.golang"

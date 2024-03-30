@@ -2,7 +2,7 @@ module parops
 
 go 1.21.0
 
-replace parops.libs/messages => ../libs/messages
+replace parops.libs/paroplib => ../libs/paroplib
 
 require (
 	github.com/eclipse/paho.mqtt.golang v1.4.3 // indirect
@@ -22,5 +22,5 @@ require (
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
-	parops.libs/messages v0.0.0-00010101000000-000000000000
+	parops.libs/paroplib v0.0.0-00010101000000-000000000000
 )

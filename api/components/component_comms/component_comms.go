@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"parops.libs/messages"
+	"parops.libs/paroplib/messages"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	uuid "github.com/google/uuid"

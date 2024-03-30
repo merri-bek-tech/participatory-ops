@@ -2,7 +2,7 @@ package components
 
 import (
 	"fmt"
-	"parops.libs/messages"
+	"parops.libs/paroplib/messages"
 	compCache "parops/components/component_cache"
 	comms "parops/components/component_comms"
 )
