@@ -71,6 +71,9 @@ func (app *AppData) init() error {
 	log.Println("Initializing app")
 	app.config = configs.LoadConfig(true)
 	app.client = msg.Connect(app.config.Computed.Uuid)
+	app.client.SubscribeDevice(msg.CommsHandlers{
+		HandleHeartbeat: nil,
+	})
 
 	return nil
 }

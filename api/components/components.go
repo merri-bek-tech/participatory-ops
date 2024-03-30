@@ -19,7 +19,7 @@ func MonitorComponents(cache *compCache.ComponentCache) {
 		},
 	}
 
-	client.Subscribe("components/+", handlers)
+	client.SubscribeAllComponents(handlers)
 }
 
 func OnHeartbeat(heartbeat msg.ComponentHeartbeat, cache *compCache.ComponentCache) {

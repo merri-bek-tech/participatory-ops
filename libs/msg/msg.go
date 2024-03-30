@@ -42,8 +42,12 @@ func (client *Client) PublishHeartbeat() {
 	transmitHeartbeat("components/"+client.DeviceId, client.Mqtt, client.DeviceId)
 }
 
-func (client *Client) Subscribe(topic string, handlers CommsHandlers) {
-	subscribe(topic, client.Mqtt, handlers)
+func (client *Client) SubscribeAllComponents(handlers CommsHandlers) {
+	subscribe("components/+", client.Mqtt, handlers)
+}
+
+func (client *Client) SubscribeDevice(handlers CommsHandlers) {
+	subscribe("components/"+client.DeviceId, client.Mqtt, handlers)
 }
 
 // PRIVATE
@@ -124,6 +128,10 @@ var connectLostHandler paho.ConnectionLostHandler = func(client paho.Client, err
 }
 
 func handleHeartbeatMessage(handlers CommsHandlers, _ Meta, contents string) {
+	if handlers.HandleHeartbeat == nil {
+		return
+	}
+
 	fmt.Println("Received heartbeat message: ", contents)
 
 	var heartbeat ComponentHeartbeat
