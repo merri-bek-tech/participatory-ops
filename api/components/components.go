@@ -3,18 +3,23 @@ package components
 import (
 	"fmt"
 	compCache "parops/components/component_cache"
-	comms "parops/components/component_comms"
 
+	"github.com/google/uuid"
 	"parops.libs/msg"
 )
 
 var detailsCheckFrequencySeconds int64 = 20
 
 func MonitorComponents(cache *compCache.ComponentCache) {
-	comms.MonitorComponents(msg.CommsHandlers{
+	deviceId := "api-" + uuid.New().String()
+	client := msg.Connect(deviceId)
+	handlers := msg.CommsHandlers{
 		HandleHeartbeat: func(heartbeat msg.ComponentHeartbeat) {
 			OnHeartbeat(heartbeat, cache)
-		}})
+		},
+	}
+
+	client.Subscribe("components/+", handlers)
 }
 
 func OnHeartbeat(heartbeat msg.ComponentHeartbeat, cache *compCache.ComponentCache) {
