@@ -7,3 +7,9 @@ export interface ComponentStatus {
   uuid: string
   details?: ComponentDetails | null
 }
+
+export interface Scheme {
+  id: string
+  name: string
+  domains: string[]
+}

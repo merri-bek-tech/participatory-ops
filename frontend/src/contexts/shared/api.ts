@@ -1,4 +1,4 @@
-import { ComponentStatus } from "./types"
+import { ComponentStatus, Scheme } from "./types"
 
 const defaultHeaders = {
   "Content-Type": "application/json",
@@ -25,6 +25,15 @@ class Api {
     })
       .then((response: Response) => response.json())
       .then((json: any) => json as ComponentStatus[])
+  }
+
+  schemesIndex(): Promise<Scheme[]> {
+    return fetch(`${this.base_url}/schemes`, {
+      method: "GET",
+      headers: defaultHeaders,
+    })
+      .then((response: Response) => response.json())
+      .then((json: any) => json as Scheme[])
   }
 }
 
