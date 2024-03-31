@@ -3,11 +3,10 @@ import { Scheme } from "../../shared/types"
 import { FullPageLoading } from "../../shared"
 import { Api } from "../../shared"
 
-const api = new Api()
-
 type ChildrenWithSchemes = (schemes: Scheme[]) => React.ReactNode
 
 export default function WithSchemes({ children }: { children: ChildrenWithSchemes }) {
+  const api = new Api()
   const [schemes, setSchemes] = useState<Scheme[]>([])
 
   useEffect(() => {

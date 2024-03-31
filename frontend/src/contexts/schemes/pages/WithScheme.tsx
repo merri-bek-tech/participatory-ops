@@ -4,14 +4,12 @@ import WithSchemes from "./WithSchemes"
 import { SchemeContext } from "../context"
 import { Center } from "@chakra-ui/react"
 
-function WithSchemeFromSchemes({ schemes, children }: { schemes: Scheme[]; children: React.ReactNode }) {
+function WithSchemeFromSchemes({ schemes, hostname, children }: { schemes: Scheme[]; hostname: string; children: React.ReactNode }) {
   const [scheme, setScheme] = useState<Scheme | null>(null)
 
   useEffect(() => {
-    if (schemes.length > 0) {
-      setScheme(schemes[0])
-    }
-  }, [schemes])
+    setScheme(schemes.find((scheme) => scheme.hostnames.includes(hostname)) || null)
+  }, [schemes, hostname])
 
   if (!scheme) {
     return <Center>Could not select a scheme.</Center>
@@ -20,5 +18,13 @@ function WithSchemeFromSchemes({ schemes, children }: { schemes: Scheme[]; child
 }
 
 export default function WithScheme({ children }: { children: React.ReactNode }) {
-  return <WithSchemes>{(schemes: Scheme[]) => <WithSchemeFromSchemes schemes={schemes}>{children}</WithSchemeFromSchemes>}</WithSchemes>
+  return (
+    <WithSchemes>
+      {(schemes: Scheme[]) => (
+        <WithSchemeFromSchemes schemes={schemes} hostname={window.location.hostname}>
+          {children}
+        </WithSchemeFromSchemes>
+      )}
+    </WithSchemes>
+  )
 }

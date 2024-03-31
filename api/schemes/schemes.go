@@ -16,9 +16,9 @@ var schemes = []SchemeIdentity{
 }
 
 type SchemeIdentity struct {
-	Name    string   `json:"name"`
-	Id      string   `json:"id"`
-	Domains []string `json:"domains"`
+	Name      string   `json:"name"`
+	Id        string   `json:"id"`
+	Hostnames []string `json:"hostnames"`
 }
 
 func GetIndex(c echo.Context) error {

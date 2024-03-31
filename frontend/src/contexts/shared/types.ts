@@ -11,5 +11,5 @@ export interface ComponentStatus {
 export interface Scheme {
   id: string
   name: string
-  domains: string[]
+  hostnames: string[]
 }
