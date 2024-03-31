@@ -2,13 +2,37 @@ package components
 
 import (
 	"log"
+	"net/http"
 	compCache "parops/components/component_cache"
+
+	"github.com/labstack/echo/v4"
 
 	"github.com/google/uuid"
 	"parops.libs/msg"
 )
 
 var detailsCheckFrequencySeconds int64 = 20
+
+type ComponentStatus struct {
+	Uuid    string                `json:"uuid"`
+	Status  string                `json:"status"`
+	Details *msg.ComponentDetails `json:"details"`
+}
+
+func GetInbox(c echo.Context, cache *compCache.ComponentCache) error {
+	components := cache.ItemList()
+	statuses := make([]ComponentStatus, 0, cache.ItemCount())
+
+	for _, cacheItem := range components {
+		statuses = append(statuses, ComponentStatus{
+			Uuid:    cacheItem.Uuid,
+			Status:  compCache.Status(cacheItem),
+			Details: cacheItem.Details,
+		})
+	}
+
+	return c.JSON(http.StatusOK, statuses)
+}
 
 func MonitorComponents(cache *compCache.ComponentCache) {
 	deviceId := "api-" + uuid.New().String()
