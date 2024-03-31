@@ -1,23 +1,20 @@
 import { useEffect, useState } from "react"
 import { Scheme } from "../../shared/types"
-import { FullPageLoading } from "../../shared"
-import { Api } from "../../shared"
+import WithSchemes from "./WithSchemes"
+import { SchemeContext } from "../context"
 
-const api = new Api()
-
-export default function WithScheme({ children }: { children: React.ReactNode }) {
-  const [schemes, setSchemes] = useState<Scheme[]>([])
+function WithSchemeFromSchemes({ schemes, children }: { schemes: Scheme[]; children: React.ReactNode }) {
+  const [scheme, setScheme] = useState<Scheme | null>(null)
 
   useEffect(() => {
-    api.schemesIndex().then((data: Scheme[]) => {
-      setSchemes(data)
-      console.log("got schemes: ", data)
-    })
-  }, [])
+    if (schemes.length > 0) {
+      setScheme(schemes[1])
+    }
+  }, [schemes])
 
-  if (schemes.length === 0) {
-    return <FullPageLoading />
-  }
+  return <SchemeContext.Provider value={scheme}>{children}</SchemeContext.Provider>
+}
 
-  return children
+export default function WithScheme({ children }: { children: React.ReactNode }) {
+  return <WithSchemes>{(schemes: Scheme[]) => <WithSchemeFromSchemes schemes={schemes}>{children}</WithSchemeFromSchemes>}</WithSchemes>
 }
