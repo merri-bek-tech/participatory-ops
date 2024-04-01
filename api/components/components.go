@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	compCache "parops/components/component_cache"
+	"parops/schemes"
 
 	"github.com/labstack/echo/v4"
 
@@ -19,7 +20,7 @@ type ComponentStatus struct {
 	Details *msg.ComponentDetails `json:"details"`
 }
 
-func GetInbox(c echo.Context, cache *compCache.ComponentCache) error {
+func GetInbox(c echo.Context, _ *schemes.SchemeIdentity, cache *compCache.ComponentCache) error {
 	components := cache.ItemList()
 	statuses := make([]ComponentStatus, 0, cache.ItemCount())
 
@@ -34,11 +35,16 @@ func GetInbox(c echo.Context, cache *compCache.ComponentCache) error {
 	return c.JSON(http.StatusOK, statuses)
 }
 
-func MonitorComponents(cache *compCache.ComponentCache) {
+func MonitorComponents(caches *map[string]*compCache.ComponentCache) {
 	deviceId := "api-" + uuid.New().String()
 	client := msg.Connect(deviceId)
+
+	// Hack for now, just use a single cache
+	cache := compCache.CacheForScheme(caches, "mbt-dev")
+
 	handlers := msg.CommsHandlers{
 		HandleHeartbeat: func(heartbeat msg.ComponentHeartbeat) {
+			log.Println("received heartbeat")
 			OnHeartbeat(heartbeat, cache, client)
 		},
 		ComponentDetails: func(details msg.ComponentDetails) {

@@ -19,7 +19,7 @@ class Api {
   }
 
   inbox(): Promise<ComponentStatus[]> {
-    return fetch(`${this.base_url}/inbox`, {
+    return fetch(`${this.base_url}/schemes/mbt-dev/inbox`, {
       method: "GET",
       headers: defaultHeaders,
     })

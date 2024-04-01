@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	cache := compCache.NewComponentCache()
+	caches := compCache.NewComponentCachesForSchemes()
 
 	e := echo.New()
 
@@ -22,11 +22,11 @@ func main() {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 	e.GET("/api/schemes", schemes.GetIndex)
-	e.GET("/api/inbox", compCache.WithCache(comps.GetInbox, cache))
+	e.GET("/api/schemes/:schemeId/inbox", schemes.WithScheme(compCache.WithCache(comps.GetInbox, caches)))
 
 	e.Static("/", "/app/web")
 
-	go comps.MonitorComponents(cache)
+	go comps.MonitorComponents(caches)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

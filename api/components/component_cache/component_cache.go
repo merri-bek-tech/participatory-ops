@@ -3,6 +3,7 @@ package component_cache
 import (
 	"cmp"
 	"log"
+	"parops/schemes"
 	"slices"
 	"time"
 
@@ -23,7 +24,7 @@ type Component struct {
 	DetailsRequestedAt int64
 }
 
-type HandlerWithComponentCache func(c echo.Context, cache *ComponentCache) error
+type HandlerWithComponentCache func(c echo.Context, scheme *schemes.SchemeIdentity, cache *ComponentCache) error
 
 func NewComponentCache() *ComponentCache {
 	return &ComponentCache{
@@ -31,9 +32,29 @@ func NewComponentCache() *ComponentCache {
 	}
 }
 
-func WithCache(next HandlerWithComponentCache, cache *ComponentCache) echo.HandlerFunc {
-	return func(context echo.Context) error {
-		return next(context, cache)
+func NewComponentCachesForSchemes() *map[string]*ComponentCache {
+	caches := map[string]*ComponentCache{}
+	return &caches
+}
+
+func WithCache(next HandlerWithComponentCache, caches *map[string]*ComponentCache) schemes.HandlerFuncWithScheme {
+	return func(context echo.Context, scheme *schemes.SchemeIdentity) error {
+		return next(context, scheme, CacheForScheme(caches, scheme.Id))
+	}
+}
+
+func CacheForScheme(caches *map[string]*ComponentCache, schemeId string) *ComponentCache {
+	if schemeId == "" {
+		log.Println("schemeId is required, using transient cache")
+		NewComponentCache()
+	}
+
+	if cache, exists := (*caches)[schemeId]; !exists {
+		newCache := NewComponentCache()
+		(*caches)[schemeId] = newCache
+		return newCache
+	} else {
+		return cache
 	}
 }
 

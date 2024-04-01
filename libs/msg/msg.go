@@ -70,11 +70,12 @@ func (client *Client) SubscribeDevice(handlers CommsHandlers) {
 // PRIVATE
 
 func deviceTopic(uuid string) string {
-	return "components/" + uuid
+	schemeId := "mbt-dev"
+	return "schemes/" + schemeId + "/components/" + uuid
 }
 
 func allDevicesTopic() string {
-	return "components/+"
+	return "schemes/+/components/+"
 }
 
 func (client *Client) publishHeartbeat(topic string, data ComponentHeartbeat) paho.Token {

@@ -1,6 +1,7 @@
 package schemes
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -21,6 +22,35 @@ type SchemeIdentity struct {
 	Hostnames []string `json:"hostnames"`
 }
 
+type HandlerFuncWithScheme func(c echo.Context, scheme *SchemeIdentity) error
+
 func GetIndex(c echo.Context) error {
 	return c.JSON(http.StatusOK, schemes)
+}
+
+func GetScheme(id string) (scheme *SchemeIdentity, exists bool) {
+	for _, scheme := range schemes {
+		if scheme.Id == id {
+			return &scheme, true
+		}
+	}
+	return nil, false
+}
+
+func WithScheme(next HandlerFuncWithScheme) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		schemeId := c.Param("schemeId")
+		if schemeId == "" {
+			log.Println("schemeID not found")
+			return c.String(http.StatusBadRequest, "schemeId is required")
+		}
+
+		scheme, exists := GetScheme(schemeId)
+		if !exists {
+			log.Println("scheme not found", schemeId)
+			return c.String(http.StatusNotFound, "scheme not found")
+		}
+
+		return next(c, scheme)
+	}
 }
