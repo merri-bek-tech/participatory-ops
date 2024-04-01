@@ -71,10 +71,12 @@ func (app *AppData) init() error {
 	log.Println("Initializing app")
 	app.config = configs.LoadConfig(true)
 	app.client = msg.Connect(app.config.Computed.Uuid)
-	app.client.SubscribeDevice(msg.CommsHandlers{
+
+	handlers := msg.CommsHandlers{
 		HandleHeartbeat:  nil,
 		DetailsRequested: func(schemeId string) { app.onDetailsRequested(schemeId) },
-	})
+	}
+	app.client.SubscribeDevice(app.config.SchemeId, handlers)
 
 	return nil
 }

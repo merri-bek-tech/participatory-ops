@@ -63,8 +63,8 @@ func (client *Client) SubscribeAllComponents(handlers CommsHandlers) {
 	subscribe(allDevicesTopic(), client.Mqtt, handlers)
 }
 
-func (client *Client) SubscribeDevice(handlers CommsHandlers) {
-	subscribe(deviceTopic("mbt-dev", client.DeviceId), client.Mqtt, handlers)
+func (client *Client) SubscribeDevice(schemeId string, handlers CommsHandlers) {
+	subscribe(deviceTopic(schemeId, client.DeviceId), client.Mqtt, handlers)
 }
 
 // PRIVATE
