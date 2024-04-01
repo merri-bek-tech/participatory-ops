@@ -73,7 +73,7 @@ func (app *AppData) init() error {
 	app.client = msg.Connect(app.config.Computed.Uuid)
 	app.client.SubscribeDevice(msg.CommsHandlers{
 		HandleHeartbeat:  nil,
-		DetailsRequested: func() { app.onDetailsRequested() },
+		DetailsRequested: func(schemeId string) { app.onDetailsRequested(schemeId) },
 	})
 
 	return nil
@@ -104,8 +104,13 @@ func run(ctx context.Context, app *AppData) error {
 	}
 }
 
-func (app *AppData) onDetailsRequested() {
+func (app *AppData) onDetailsRequested(schemeId string) {
 	log.Println("Details requested")
+
+	if app.config.SchemeId != schemeId {
+		log.Printf("[%s] Scheme ID mismatch. Got %s\n", app.config.SchemeId, schemeId)
+		return
+	}
 
 	app.client.PublishDetails(app.config.Computed.Uuid, msg.ComponentDetails{
 		Uuid:     app.config.Computed.Uuid,

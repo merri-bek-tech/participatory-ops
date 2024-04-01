@@ -16,7 +16,7 @@ type ComponentDetails struct {
 }
 
 type CommsHandlers struct {
-	HandleHeartbeat  func(heartbeat ComponentHeartbeat)
-	DetailsRequested func()
-	ComponentDetails func(details ComponentDetails)
+	HandleHeartbeat  func(schemeId string, heartbeat ComponentHeartbeat)
+	DetailsRequested func(schemeId string)
+	ComponentDetails func(schemeId string, details ComponentDetails)
 }

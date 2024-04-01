@@ -184,7 +184,7 @@ var connectLostHandler paho.ConnectionLostHandler = func(client paho.Client, err
 	log.Printf("Connection lost: %v", err)
 }
 
-func handleComponentHeartbeatMessage(handlers CommsHandlers, _ Meta, contents string) {
+func handleComponentHeartbeatMessage(schemeId string, handlers CommsHandlers, _ Meta, contents string) {
 	if handlers.HandleHeartbeat == nil {
 		return
 	}
@@ -198,18 +198,18 @@ func handleComponentHeartbeatMessage(handlers CommsHandlers, _ Meta, contents st
 		return
 	}
 
-	handlers.HandleHeartbeat(heartbeat)
+	handlers.HandleHeartbeat(schemeId, heartbeat)
 }
 
-func handleDetailsRequestedMessage(handlers CommsHandlers, _ Meta, _ string) {
+func handleDetailsRequestedMessage(schemeId string, handlers CommsHandlers, _ Meta, _ string) {
 	if handlers.DetailsRequested == nil {
 		return
 	}
 
-	handlers.DetailsRequested()
+	handlers.DetailsRequested(schemeId)
 }
 
-func handleComponentDetailsMessage(handlers CommsHandlers, _ Meta, contents string) {
+func handleComponentDetailsMessage(schemeId string, handlers CommsHandlers, _ Meta, contents string) {
 	if handlers.ComponentDetails == nil {
 		return
 	}
@@ -221,19 +221,19 @@ func handleComponentDetailsMessage(handlers CommsHandlers, _ Meta, contents stri
 		return
 	}
 
-	handlers.ComponentDetails(details)
+	handlers.ComponentDetails(schemeId, details)
 }
 
-func handleParopsMessage(handlers CommsHandlers, meta Meta, contents string) {
+func handleParopsMessage(schemeId string, handlers CommsHandlers, meta Meta, contents string) {
 	switch meta.Type {
 	case "ComponentHeartbeat":
-		handleComponentHeartbeatMessage(handlers, meta, contents)
+		handleComponentHeartbeatMessage(schemeId, handlers, meta, contents)
 	case "DetailsRequested":
-		handleDetailsRequestedMessage(handlers, meta, contents)
+		handleDetailsRequestedMessage(schemeId, handlers, meta, contents)
 	case "ComponentDetails":
-		handleComponentDetailsMessage(handlers, meta, contents)
+		handleComponentDetailsMessage(schemeId, handlers, meta, contents)
 	default:
-		log.Println("Unknown message type: ", meta.Type)
+		log.Printf("[%s] Unknown message type %s\n", schemeId, meta.Type)
 	}
 }
 
@@ -243,6 +243,8 @@ func handleMqttMessage(handlers CommsHandlers, message paho.Message) {
 	// split the message payload by |
 	payload := string(message.Payload())
 	payloadParts := strings.Split(payload, "|")
+
+	schemeId := parseSchemeIdFromTopic(message.Topic())
 
 	if len(payloadParts) != 2 {
 		log.Println("Invalid message format")
@@ -261,7 +263,17 @@ func handleMqttMessage(handlers CommsHandlers, message paho.Message) {
 		return
 	}
 
-	handleParopsMessage(handlers, meta, contentsString)
+	handleParopsMessage(schemeId, handlers, meta, contentsString)
+}
+
+func parseSchemeIdFromTopic(topic string) string {
+	parts := strings.Split(topic, "/")
+
+	if parts[0] != "schemes" {
+		log.Println("Invalid topic format (expected schemes/xxx/...): ", topic)
+	}
+
+	return parts[1]
 }
 
 func subscribe(topic string, client paho.Client, handlers CommsHandlers) {

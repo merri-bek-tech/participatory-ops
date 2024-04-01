@@ -39,16 +39,15 @@ func MonitorComponents(caches *map[string]*compCache.ComponentCache) {
 	deviceId := "api-" + uuid.New().String()
 	client := msg.Connect(deviceId)
 
-	// Hack for now, just use a single cache
-	cache := compCache.CacheForScheme(caches, "mbt-dev")
-
 	handlers := msg.CommsHandlers{
-		HandleHeartbeat: func(heartbeat msg.ComponentHeartbeat) {
-			log.Println("received heartbeat")
+		HandleHeartbeat: func(schemeId string, heartbeat msg.ComponentHeartbeat) {
+			log.Printf("[%s] received heartbeat\n", schemeId)
+			cache := compCache.CacheForScheme(caches, schemeId)
 			OnHeartbeat(heartbeat, cache, client)
 		},
-		ComponentDetails: func(details msg.ComponentDetails) {
-			log.Printf("Received details for %s: %s\n", details.Uuid, details.HostName)
+		ComponentDetails: func(schemeId string, details msg.ComponentDetails) {
+			log.Printf("Received details (%s) for %s: %s\n", schemeId, details.Uuid, details.HostName)
+			cache := compCache.CacheForScheme(caches, schemeId)
 			cache.SetDetails(details.Uuid, &details)
 		},
 	}
