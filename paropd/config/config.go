@@ -14,6 +14,7 @@ import (
 
 type Config struct {
 	Computed *computed.ComputedConfig
+	SchemeId string
 }
 
 func LoadConfig(recompute bool) *Config {
@@ -25,6 +26,7 @@ func LoadConfig(recompute bool) *Config {
 
 	return &Config{
 		Computed: computed,
+		SchemeId: "mbt-dev",
 	}
 }
 

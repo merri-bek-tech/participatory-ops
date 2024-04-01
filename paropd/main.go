@@ -99,7 +99,7 @@ func run(ctx context.Context, app *AppData) error {
 		case <-ctx.Done():
 			return nil
 		case <-time.Tick(defaultTick):
-			app.client.PublishMyHeartbeat()
+			app.client.PublishMyHeartbeat(app.config.SchemeId)
 		}
 	}
 }

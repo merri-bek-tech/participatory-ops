@@ -41,22 +41,22 @@ func (client *Client) Disconnect() {
 	client.Mqtt.Disconnect(250)
 }
 
-func (client *Client) PublishMyHeartbeat() {
+func (client *Client) PublishMyHeartbeat(schemeId string) {
 	payload := ComponentHeartbeat{
 		Uuid: client.DeviceId,
 		At:   time.Now().Unix(),
 	}
 
-	client.publishHeartbeat(deviceTopic(client.DeviceId), payload)
+	client.publishHeartbeat(deviceTopic(schemeId, client.DeviceId), payload)
 }
 
 func (client *Client) PublishDetailsRequested(uuid string) {
-	client.publishDetailsRequested(deviceTopic(uuid))
+	client.publishDetailsRequested(deviceTopic("mbt-dev", uuid))
 }
 
 func (client *Client) PublishDetails(uuid string, details ComponentDetails) {
 	text := encodeComponentDetails(details)
-	client.Mqtt.Publish(deviceTopic(uuid), AtMostOnce, false, text)
+	client.Mqtt.Publish(deviceTopic("mbt-dev", uuid), AtMostOnce, false, text)
 }
 
 func (client *Client) SubscribeAllComponents(handlers CommsHandlers) {
@@ -64,13 +64,12 @@ func (client *Client) SubscribeAllComponents(handlers CommsHandlers) {
 }
 
 func (client *Client) SubscribeDevice(handlers CommsHandlers) {
-	subscribe(deviceTopic(client.DeviceId), client.Mqtt, handlers)
+	subscribe(deviceTopic("mbt-dev", client.DeviceId), client.Mqtt, handlers)
 }
 
 // PRIVATE
 
-func deviceTopic(uuid string) string {
-	schemeId := "mbt-dev"
+func deviceTopic(schemeId string, uuid string) string {
 	return "schemes/" + schemeId + "/components/" + uuid
 }
 
