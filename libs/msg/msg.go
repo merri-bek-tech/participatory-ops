@@ -50,8 +50,8 @@ func (client *Client) PublishMyHeartbeat(schemeId string) {
 	client.publishHeartbeat(deviceTopic(schemeId, client.DeviceId), payload)
 }
 
-func (client *Client) PublishDetailsRequested(uuid string) {
-	client.publishDetailsRequested(deviceTopic("mbt-dev", uuid))
+func (client *Client) PublishDetailsRequested(schemeId string, uuid string) {
+	client.publishDetailsRequested(deviceTopic(schemeId, uuid))
 }
 
 func (client *Client) PublishDetails(uuid string, details ComponentDetails) {

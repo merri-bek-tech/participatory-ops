@@ -43,7 +43,7 @@ func MonitorComponents(caches *map[string]*compCache.ComponentCache) {
 		HandleHeartbeat: func(schemeId string, heartbeat msg.ComponentHeartbeat) {
 			log.Printf("[%s] received heartbeat\n", schemeId)
 			cache := compCache.CacheForScheme(caches, schemeId)
-			OnHeartbeat(heartbeat, cache, client)
+			OnHeartbeat(schemeId, heartbeat, cache, client)
 		},
 		ComponentDetails: func(schemeId string, details msg.ComponentDetails) {
 			log.Printf("Received details (%s) for %s: %s\n", schemeId, details.Uuid, details.HostName)
@@ -55,20 +55,20 @@ func MonitorComponents(caches *map[string]*compCache.ComponentCache) {
 	client.SubscribeAllComponents(handlers)
 }
 
-func OnHeartbeat(heartbeat msg.ComponentHeartbeat, cache *compCache.ComponentCache, client *msg.Client) {
+func OnHeartbeat(schemeId string, heartbeat msg.ComponentHeartbeat, cache *compCache.ComponentCache, client *msg.Client) {
 	cache.OnHeartbeat(heartbeat)
 
 	component, exists := cache.Get(heartbeat.Uuid)
 	if exists {
 		if component.NeedsDetails(detailsCheckFrequencySeconds) {
-			RequestDetails(component, client)
+			RequestDetails(schemeId, component, client)
 		}
 	}
 }
 
-func RequestDetails(component *compCache.Component, client *msg.Client) {
+func RequestDetails(schemeId string, component *compCache.Component, client *msg.Client) {
 	log.Printf("Requesting details for %s\n", component.Uuid)
 
-	client.PublishDetailsRequested(component.Uuid)
+	client.PublishDetailsRequested(schemeId, component.Uuid)
 	component.DetailsRequested()
 }
