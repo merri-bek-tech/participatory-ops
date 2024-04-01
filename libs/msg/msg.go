@@ -54,9 +54,9 @@ func (client *Client) PublishDetailsRequested(schemeId string, uuid string) {
 	client.publishDetailsRequested(deviceTopic(schemeId, uuid))
 }
 
-func (client *Client) PublishDetails(uuid string, details ComponentDetails) {
+func (client *Client) PublishDetails(schemeId string, uuid string, details ComponentDetails) {
 	text := encodeComponentDetails(details)
-	client.Mqtt.Publish(deviceTopic("mbt-dev", uuid), AtMostOnce, false, text)
+	client.Mqtt.Publish(deviceTopic(schemeId, uuid), AtMostOnce, false, text)
 }
 
 func (client *Client) SubscribeAllComponents(handlers CommsHandlers) {

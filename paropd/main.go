@@ -114,7 +114,7 @@ func (app *AppData) onDetailsRequested(schemeId string) {
 		return
 	}
 
-	app.client.PublishDetails(app.config.Computed.Uuid, msg.ComponentDetails{
+	app.client.PublishDetails(app.config.SchemeId, app.config.Computed.Uuid, msg.ComponentDetails{
 		Uuid:     app.config.Computed.Uuid,
 		HostName: app.config.Computed.HostName,
 	})
