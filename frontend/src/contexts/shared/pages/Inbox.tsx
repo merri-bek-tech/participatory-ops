@@ -2,15 +2,17 @@ import { Box, Grid, GridItem, Heading } from "@chakra-ui/react"
 import ComponentStatusCard from "../components/ComponentStatusCard"
 import { ComponentStatus } from "../types"
 import Api from "../api"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { useInterval } from "usehooks-ts"
-
-const api = new Api()
+import { SchemeContext } from "../../schemes"
 
 export default function Inbox() {
   const [components, setComponents] = useState<ComponentStatus[]>([])
+  const scheme = useContext(SchemeContext)
 
   const pollApi = () => {
+    const api = new Api().forScheme(scheme.id)
+
     api.inbox().then((data) => {
       setComponents(data)
       console.log(data)

@@ -18,13 +18,8 @@ class Api {
     console.log("url", this.base_url)
   }
 
-  inbox(): Promise<ComponentStatus[]> {
-    return fetch(`${this.base_url}/schemes/mbt-dev/inbox`, {
-      method: "GET",
-      headers: defaultHeaders,
-    })
-      .then((response: Response) => response.json())
-      .then((json: any) => json as ComponentStatus[])
+  forScheme(schemeId: string) {
+    return new SchemeApi(this.base_url + `/schemes/${schemeId}`)
   }
 
   schemesIndex(): Promise<Scheme[]> {
@@ -34,6 +29,23 @@ class Api {
     })
       .then((response: Response) => response.json())
       .then((json: any) => json as Scheme[])
+  }
+}
+
+class SchemeApi {
+  base_url: string
+
+  constructor(base_url: string) {
+    this.base_url = base_url
+  }
+
+  inbox(): Promise<ComponentStatus[]> {
+    return fetch(`${this.base_url}/inbox`, {
+      method: "GET",
+      headers: defaultHeaders,
+    })
+      .then((response: Response) => response.json())
+      .then((json: any) => json as ComponentStatus[])
   }
 }
 
