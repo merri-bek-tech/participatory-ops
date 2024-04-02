@@ -18,20 +18,26 @@ export default function ComponentStatusCard({ status, uuid, details }: Component
         <Text fontSize="sm">{status}</Text>
       </CardHeader>
       <CardBody>
-        <TableContainer>
-          <Table __css={{ tableLayout: "fixed", width: "full" }} variant="simple">
-            <Tbody>
-              <Tr>
-                <Th p={0} w="50px">
-                  UUID
-                </Th>
-                <Td p={0}>
-                  <Text overflow="hidden">{uuid.slice(0, 20) + "..."}</Text>
-                </Td>
-              </Tr>
-            </Tbody>
-          </Table>
-        </TableContainer>
+        {details && (
+          <TableContainer>
+            <Table variant="simple">
+              <Tbody>
+                {Object.entries(details).map(([key, value]) => (
+                  <Tr>
+                    <Th p={0} w="1px" whiteSpace="nowrap" pr={2}>
+                      {key}
+                    </Th>
+                    <Td p={0} maxWidth="100px">
+                      <Text overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
+                        {value}
+                      </Text>
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        )}
       </CardBody>
     </Card>
   )

@@ -11,6 +11,10 @@ type ComputedConfig struct {
 	Uuid string `pkl:"uuid"`
 
 	HostName string `pkl:"hostName"`
+
+	ProductName string `pkl:"productName"`
+
+	SysVendor string `pkl:"sysVendor"`
 }
 
 // LoadFromPath loads the pkl module at the given path and evaluates it into a ComputedConfig

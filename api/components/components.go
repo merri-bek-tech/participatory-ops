@@ -46,7 +46,7 @@ func MonitorComponents(caches *map[string]*compCache.ComponentCache) {
 			OnHeartbeat(schemeId, heartbeat, cache, client)
 		},
 		ComponentDetails: func(schemeId string, details msg.ComponentDetails) {
-			log.Printf("Received details (%s) for %s: %s\n", schemeId, details.Uuid, details.HostName)
+			log.Printf("[%s] Received details: %v\n", schemeId, details)
 			cache := compCache.CacheForScheme(caches, schemeId)
 			cache.SetDetails(details.Uuid, &details)
 		},

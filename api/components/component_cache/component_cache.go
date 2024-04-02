@@ -59,7 +59,7 @@ func CacheForScheme(caches *map[string]*ComponentCache, schemeId string) *Compon
 }
 
 func Status(component *Component) string {
-	log.Printf("Checking status for %v\n", component)
+	//log.Printf("Checking status for %v\n", component)
 
 	status := "unknown"
 	if secondsSince(component.UpdatedAt) < 10 {

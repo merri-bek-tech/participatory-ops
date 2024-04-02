@@ -15,7 +15,7 @@ import (
 	"parops.libs/msg"
 )
 
-const defaultTick = 3 * time.Second
+const defaultTick = 6 * time.Second
 
 type AppData struct {
 	config *configs.Config
@@ -114,8 +114,14 @@ func (app *AppData) onDetailsRequested(schemeId string) {
 		return
 	}
 
-	app.client.PublishDetails(app.config.SchemeId, app.config.Computed.Uuid, msg.ComponentDetails{
-		Uuid:     app.config.Computed.Uuid,
-		HostName: app.config.Computed.HostName,
-	})
+	details := msg.ComponentDetails{
+		Uuid:        app.config.Computed.Uuid,
+		HostName:    app.config.Computed.HostName,
+		ProductName: app.config.Computed.ProductName,
+		SysVendor:   app.config.Computed.SysVendor,
+	}
+
+	log.Printf("Publishing details: %v\n", details)
+
+	app.client.PublishDetails(app.config.SchemeId, app.config.Computed.Uuid, details)
 }

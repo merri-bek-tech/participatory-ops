@@ -11,8 +11,10 @@ type ComponentHeartbeat struct {
 }
 
 type ComponentDetails struct {
-	Uuid     string `json:"uuid"`
-	HostName string `json:"hostName"`
+	Uuid        string `json:"uuid"`
+	HostName    string `json:"hostName"`
+	ProductName string `json:"productName"`
+	SysVendor   string `json:"sysVendor"`
 }
 
 type CommsHandlers struct {

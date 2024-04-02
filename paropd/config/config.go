@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"paropd/config/computed"
+	"paropd/config/computer"
 	"reflect"
 	"strconv"
 
@@ -62,20 +63,10 @@ func readExistingComputedConfig(filePath string) *computed.ComputedConfig {
 }
 
 func recomputeComputedConfig(existing *computed.ComputedConfig) *computed.ComputedConfig {
-	changed := computed.ComputedConfig{
-		HostName: hostnameOrDefault(""),
-	}
+	changed := computer.ComputeConfig()
 
 	changed.Uuid = getUuid(existing)
-	return &changed
-}
-
-func hostnameOrDefault(defaultHostname string) string {
-	hostname, err := os.Hostname()
-	if err != nil {
-		return defaultHostname
-	}
-	return hostname
+	return changed
 }
 
 func getUuid(existing *computed.ComputedConfig) string {
