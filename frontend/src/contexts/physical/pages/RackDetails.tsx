@@ -1,11 +1,11 @@
 import { useLoaderData } from "react-router-dom"
-import { RackDetails } from "../types"
+import { RackDetails as RackDetailsType } from "../types"
 import { Box, Card, CardBody, Heading, Image, Stack, Text } from "@chakra-ui/react"
 import RackPhysicalDimension from "../components/RackPhysicalDimension"
 import RackLayout from "../components/RackLayout"
 
 export default function RackDetails() {
-  const { rack } = useLoaderData() as { rack: RackDetails }
+  const { rack } = useLoaderData() as { rack: RackDetailsType }
   const { dimensions } = rack
 
   console.log(rack)
