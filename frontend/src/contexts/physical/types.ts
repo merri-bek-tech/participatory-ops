@@ -1,4 +1,4 @@
-export type GeneralStatus = "planned" | "active" | "warning" | "error"
+import { GeneralStatus } from "../shared/types"
 
 export interface PhysicalDimensionSummary {
   name: string

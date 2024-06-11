@@ -13,3 +13,5 @@ export interface Scheme {
   name: string
   hostnames: string[]
 }
+
+export type GeneralStatus = "planned" | "active" | "warning" | "error"

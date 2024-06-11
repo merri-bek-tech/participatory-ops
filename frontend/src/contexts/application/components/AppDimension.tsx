@@ -1,8 +1,8 @@
 import { Heading, Text, HStack } from "@chakra-ui/react"
-import { PhysicalDimensionSummary } from "../types"
+import { AppDimensionSummary } from "../types"
 import { StatusBox } from "../../shared"
 
-export default function RackPhysicalDimension({ name, status }: PhysicalDimensionSummary) {
+export default function AppDimension({ name, status }: AppDimensionSummary) {
   return (
     <StatusBox status={status}>
       <HStack justify="space-between">
