@@ -1,7 +1,9 @@
 import { GeneralStatus } from "../shared/types"
 
+export type PhysicalDimensionName = "power" | "compute" | "storage" | "dataLink"
+
 export interface PhysicalDimensionSummary {
-  name: string
+  name: PhysicalDimensionName
   status: GeneralStatus
 }
 

@@ -1,7 +1,9 @@
 import { GeneralStatus } from "../shared/types"
 
+export type AppDimensionName = "availability"
+
 export interface AppDimensionSummary {
-  name: string
+  name: AppDimensionName
   status: GeneralStatus
 }
 
