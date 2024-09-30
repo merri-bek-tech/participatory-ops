@@ -1,6 +1,7 @@
 package msg
 
 import (
+	"encoding/json"
 	"log"
 	"strings"
 	"time"
@@ -25,8 +26,11 @@ func (messenger *Messenger) PublishMyHeartbeat(schemeId string) {
 }
 
 func (messenger *Messenger) PublishDetailsRequested(schemeId string, uuid string) {
-	topic := deviceTopic(schemeId, messenger.DeviceId)
+	topic := deviceTopic(schemeId, uuid)
 	text := encodeDetailsRequested()
+
+	log.Println("Publishing details requested", topic)
+
 	messenger.client.Publish(topic, text)
 }
 
@@ -36,10 +40,54 @@ func (messenger *Messenger) PublishDetails(schemeId string, uuid string, details
 	messenger.client.Publish(topic, text)
 }
 
+func (messenger *Messenger) SubscribeDevice(schemeId string, handlers CommsHandlers) {
+	topic := deviceTopic(schemeId, messenger.DeviceId)
+	messenger.subscribe(topic, handlers)
+}
+
+func (messenger *Messenger) SubscribeAllComponents(handlers CommsHandlers) {
+	topic := allDevicesTopic()
+	messenger.subscribe(topic, handlers)
+}
+
+func (messenger *Messenger) subscribe(topic string, handlers CommsHandlers) {
+	log.Println("Subscribing to topic: ", topic)
+
+	messenger.client.Subscribe(topic, func(topic string, payload string) {
+		// split the message payload by |
+		payloadParts := strings.Split(payload, "|")
+
+		schemeId := parseSchemeIdFromTopic(topic)
+
+		if len(payloadParts) != 2 {
+			log.Println("Invalid message format")
+			return
+		}
+
+		// get the meta and the contents from the payloadParts
+		metaString := payloadParts[0]
+		contentsString := payloadParts[1]
+
+		// parse Meta from the meta string
+		var meta Meta
+		err := json.Unmarshal([]byte(metaString), &meta)
+		if err != nil {
+			log.Println("Failed to parse meta")
+			return
+		}
+
+		handleParopsMessage(schemeId, handlers, meta, contentsString)
+	})
+}
+
 // PRIVATE
 
 func deviceTopic(schemeId string, uuid string) string {
 	return "schemes/" + schemeId + "/components/" + uuid
+}
+
+func allDevicesTopic() string {
+	return "schemes/+/components/+"
 }
 
 func encodeHeartbeat(heartbeat ComponentHeartbeat) string {
@@ -60,10 +108,6 @@ func encodeComponentDetails(details ComponentDetails) string {
 	return encodeMessage(meta, details)
 }
 
-func allDevicesTopic() string {
-	return "schemes/+/components/+"
-}
-
 func encodeDetailsRequested() string {
 	meta := Meta{
 		Type:    "DetailsRequested",
@@ -81,4 +125,77 @@ func encodeMessage(meta Meta, body any) string {
 	}
 
 	return strings.Join([]string{metaText, payloadText}, "|")
+}
+
+func jsonString(input any) string {
+	output, err := json.Marshal(input)
+	if err != nil {
+		panic(err)
+	}
+	return string(output)
+}
+
+func parseSchemeIdFromTopic(topic string) string {
+	parts := strings.Split(topic, "/")
+
+	if parts[0] != "schemes" {
+		log.Println("Invalid topic format (expected schemes/xxx/...): ", topic)
+	}
+
+	return parts[1]
+}
+
+func handleParopsMessage(schemeId string, handlers CommsHandlers, meta Meta, contents string) {
+	switch meta.Type {
+	case "ComponentHeartbeat":
+		handleComponentHeartbeatMessage(schemeId, handlers, meta, contents)
+	case "DetailsRequested":
+		handleDetailsRequestedMessage(schemeId, handlers, meta, contents)
+	case "ComponentDetails":
+		handleComponentDetailsMessage(schemeId, handlers, meta, contents)
+	default:
+		log.Printf("[%s] Unknown message type %s\n", schemeId, meta.Type)
+	}
+}
+
+func handleComponentHeartbeatMessage(schemeId string, handlers CommsHandlers, _ Meta, contents string) {
+	if handlers.HandleHeartbeat == nil {
+		return
+	}
+
+	log.Println("Received heartbeat message: ", contents)
+
+	var heartbeat ComponentHeartbeat
+	err := json.Unmarshal([]byte(contents), &heartbeat)
+	if err != nil {
+		log.Println("Failed to parse heartbeat: ", err)
+		return
+	}
+
+	handlers.HandleHeartbeat(schemeId, heartbeat)
+}
+
+func handleDetailsRequestedMessage(schemeId string, handlers CommsHandlers, _ Meta, _ string) {
+	log.Println("Received details requested ")
+
+	if handlers.DetailsRequested == nil {
+		return
+	}
+
+	handlers.DetailsRequested(schemeId)
+}
+
+func handleComponentDetailsMessage(schemeId string, handlers CommsHandlers, _ Meta, contents string) {
+	if handlers.ComponentDetails == nil {
+		return
+	}
+
+	var details ComponentDetails
+	err := json.Unmarshal([]byte(contents), &details)
+	if err != nil {
+		log.Println("Failed to parse ComponentDetails: ", err)
+		return
+	}
+
+	handlers.ComponentDetails(schemeId, details)
 }

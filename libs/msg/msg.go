@@ -44,17 +44,12 @@ func (client *PahoConnection) Disconnect() {
 	client.Mqtt.Disconnect(250)
 }
 
-func (client *PahoConnection) PublishDetails(schemeId string, uuid string, details ComponentDetails) {
-	text := encodeComponentDetails(details)
-	client.Mqtt.Publish(deviceTopic(schemeId, uuid), AtMostOnce, false, text)
-}
-
 func (client *PahoConnection) SubscribeAllComponents(handlers CommsHandlers) {
-	subscribe(allDevicesTopic(), client.Mqtt, handlers)
+	client.GetMessenger().SubscribeAllComponents(handlers)
 }
 
 func (client *PahoConnection) SubscribeDevice(schemeId string, handlers CommsHandlers) {
-	subscribe(deviceTopic(schemeId, client.DeviceId), client.Mqtt, handlers)
+	client.GetMessenger().SubscribeDevice(schemeId, handlers)
 }
 
 // PRIVATE
@@ -76,25 +71,6 @@ func connectClient(host string, port int, clientId string) paho.Client {
 	return client
 }
 
-func jsonString(input any) string {
-	output, err := json.Marshal(input)
-	if err != nil {
-		panic(err)
-	}
-	return string(output)
-}
-
-func handleResult(token paho.Token) {
-	token.Wait()
-	// Check for errors during publishing (More on error reporting https://pkg.go.dev/github.com/eclipse/paho.mqtt.golang#readme-error-handling)
-	if token.Error() != nil {
-		log.Println("Failed to publish to topic")
-		panic(token.Error())
-	} else {
-		log.Println("Published message")
-	}
-}
-
 // this callback triggers when a message is received, it then prints the message (in the payload) and topic
 var messagePubHandler paho.MessageHandler = func(client paho.Client, msg paho.Message) {
 	log.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
@@ -110,67 +86,13 @@ var connectLostHandler paho.ConnectionLostHandler = func(client paho.Client, err
 	log.Printf("Connection lost: %v", err)
 }
 
-func handleComponentHeartbeatMessage(schemeId string, handlers CommsHandlers, _ Meta, contents string) {
-	if handlers.HandleHeartbeat == nil {
-		return
-	}
-
-	log.Println("Received heartbeat message: ", contents)
-
-	var heartbeat ComponentHeartbeat
-	err := json.Unmarshal([]byte(contents), &heartbeat)
-	if err != nil {
-		log.Println("Failed to parse heartbeat: ", err)
-		return
-	}
-
-	handlers.HandleHeartbeat(schemeId, heartbeat)
-}
-
-func handleDetailsRequestedMessage(schemeId string, handlers CommsHandlers, _ Meta, _ string) {
-	if handlers.DetailsRequested == nil {
-		return
-	}
-
-	handlers.DetailsRequested(schemeId)
-}
-
-func handleComponentDetailsMessage(schemeId string, handlers CommsHandlers, _ Meta, contents string) {
-	if handlers.ComponentDetails == nil {
-		return
-	}
-
-	var details ComponentDetails
-	err := json.Unmarshal([]byte(contents), &details)
-	if err != nil {
-		log.Println("Failed to parse ComponentDetails: ", err)
-		return
-	}
-
-	handlers.ComponentDetails(schemeId, details)
-}
-
-func handleParopsMessage(schemeId string, handlers CommsHandlers, meta Meta, contents string) {
-	switch meta.Type {
-	case "ComponentHeartbeat":
-		handleComponentHeartbeatMessage(schemeId, handlers, meta, contents)
-	case "DetailsRequested":
-		handleDetailsRequestedMessage(schemeId, handlers, meta, contents)
-	case "ComponentDetails":
-		handleComponentDetailsMessage(schemeId, handlers, meta, contents)
-	default:
-		log.Printf("[%s] Unknown message type %s\n", schemeId, meta.Type)
-	}
-}
-
-func handleMqttMessage(handlers CommsHandlers, message paho.Message) {
+func handleMqttMessage(handlers CommsHandlers, topic string, payload string) {
 	//log.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
 
 	// split the message payload by |
-	payload := string(message.Payload())
 	payloadParts := strings.Split(payload, "|")
 
-	schemeId := parseSchemeIdFromTopic(message.Topic())
+	schemeId := parseSchemeIdFromTopic(topic)
 
 	if len(payloadParts) != 2 {
 		log.Println("Invalid message format")
@@ -192,19 +114,9 @@ func handleMqttMessage(handlers CommsHandlers, message paho.Message) {
 	handleParopsMessage(schemeId, handlers, meta, contentsString)
 }
 
-func parseSchemeIdFromTopic(topic string) string {
-	parts := strings.Split(topic, "/")
-
-	if parts[0] != "schemes" {
-		log.Println("Invalid topic format (expected schemes/xxx/...): ", topic)
-	}
-
-	return parts[1]
-}
-
 func subscribe(topic string, client paho.Client, handlers CommsHandlers) {
 	handler := func(client paho.Client, message paho.Message) {
-		handleMqttMessage(handlers, message)
+		handleMqttMessage(handlers, message.Topic(), string(message.Payload()))
 	}
 
 	// subscribe to the same topic, that was published to, to receive the messages
