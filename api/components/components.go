@@ -8,7 +8,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	"github.com/google/uuid"
 	"parops.libs/msg"
 )
 
@@ -35,15 +34,12 @@ func GetInbox(c echo.Context, _ *schemes.SchemeIdentity, cache *compCache.Compon
 	return c.JSON(http.StatusOK, statuses)
 }
 
-func MonitorComponents(caches *map[string]*compCache.ComponentCache) {
-	deviceId := "api-" + uuid.New().String()
-	client := msg.Connect(deviceId)
-
+func MonitorComponents(caches *map[string]*compCache.ComponentCache, messenger *msg.Messenger) {
 	handlers := msg.CommsHandlers{
 		HandleHeartbeat: func(schemeId string, heartbeat msg.ComponentHeartbeat) {
 			log.Printf("[%s] received heartbeat\n", schemeId)
 			cache := compCache.CacheForScheme(caches, schemeId)
-			OnHeartbeat(schemeId, heartbeat, cache, client)
+			OnHeartbeat(schemeId, heartbeat, cache, messenger)
 		},
 		ComponentDetails: func(schemeId string, details msg.ComponentDetails) {
 			log.Printf("[%s] Received details: %v\n", schemeId, details)
@@ -52,23 +48,23 @@ func MonitorComponents(caches *map[string]*compCache.ComponentCache) {
 		},
 	}
 
-	client.GetMessenger().SubscribeAllComponents(handlers)
+	messenger.SubscribeAllComponents(handlers)
 }
 
-func OnHeartbeat(schemeId string, heartbeat msg.ComponentHeartbeat, cache *compCache.ComponentCache, client *msg.PahoConnection) {
+func OnHeartbeat(schemeId string, heartbeat msg.ComponentHeartbeat, cache *compCache.ComponentCache, messenger *msg.Messenger) {
 	cache.OnHeartbeat(heartbeat)
 
 	component, exists := cache.Get(heartbeat.Uuid)
 	if exists {
 		if component.NeedsDetails(detailsCheckFrequencySeconds) {
-			RequestDetails(schemeId, component, client)
+			RequestDetails(schemeId, component, messenger)
 		}
 	}
 }
 
-func RequestDetails(schemeId string, component *compCache.Component, client *msg.PahoConnection) {
+func RequestDetails(schemeId string, component *compCache.Component, messenger *msg.Messenger) {
 	log.Printf("Requesting details for %s\n", component.Uuid)
 
-	client.GetMessenger().PublishDetailsRequested(schemeId, component.Uuid)
+	messenger.PublishDetailsRequested(schemeId, component.Uuid)
 	component.DetailsRequested()
 }

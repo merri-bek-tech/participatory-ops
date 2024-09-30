@@ -32,7 +32,7 @@ func main() {
 
 	go broker.MessageBroker(func(messenger *msg.Messenger) {
 		log.Println("Broker onStarted")
-		go comps.MonitorComponents(caches)
+		go comps.MonitorComponents(caches, messenger)
 	})
 
 	e.Logger.Fatal(e.Start(":1323"))
