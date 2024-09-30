@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"time"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
 )
@@ -28,23 +27,21 @@ func Connect(deviceId string) *PahoConnection {
 	}
 }
 
-func (client *PahoConnection) getGenericClient() Client {
+func (client *PahoConnection) GetGenericClient() MqttClient {
 	return &PahoClient{
 		Mqtt: &client.Mqtt,
 	}
 }
 
-func (client *PahoConnection) Disconnect() {
-	client.Mqtt.Disconnect(250)
+func (client *PahoConnection) GetMessenger() *Messenger {
+	return &Messenger{
+		DeviceId: client.DeviceId,
+		client:   client.GetGenericClient(),
+	}
 }
 
-func (client *PahoConnection) PublishMyHeartbeat(schemeId string) {
-	payload := ComponentHeartbeat{
-		Uuid: client.DeviceId,
-		At:   time.Now().Unix(),
-	}
-
-	client.publishHeartbeat(deviceTopic(schemeId, client.DeviceId), payload)
+func (client *PahoConnection) Disconnect() {
+	client.Mqtt.Disconnect(250)
 }
 
 func (client *PahoConnection) PublishDetailsRequested(schemeId string, uuid string) {
@@ -74,18 +71,10 @@ func allDevicesTopic() string {
 	return "schemes/+/components/+"
 }
 
-func (client *PahoConnection) publishHeartbeat(topic string, data ComponentHeartbeat) {
-	log.Println("Publishing heartbeat")
-
-	genericClient := client.getGenericClient()
-	text := encodeHeartbeat(data)
-	genericClient.Publish(topic, text)
-}
-
 func (client *PahoConnection) publishDetailsRequested(topic string) {
 	log.Println("Publishing details requested")
 
-	genericClient := client.getGenericClient()
+	genericClient := client.GetGenericClient()
 	text := encodeDetailsRequested()
 	genericClient.Publish(topic, text)
 }
