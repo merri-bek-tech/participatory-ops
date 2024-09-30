@@ -76,7 +76,7 @@ func (app *AppData) init() error {
 		HandleHeartbeat:  nil,
 		DetailsRequested: func(schemeId string) { app.onDetailsRequested(schemeId) },
 	}
-	app.client.SubscribeDevice(app.config.SchemeId, handlers)
+	app.client.GetMessenger().SubscribeDevice(app.config.SchemeId, handlers)
 
 	return nil
 }

@@ -52,7 +52,7 @@ func MonitorComponents(caches *map[string]*compCache.ComponentCache) {
 		},
 	}
 
-	client.SubscribeAllComponents(handlers)
+	client.GetMessenger().SubscribeAllComponents(handlers)
 }
 
 func OnHeartbeat(schemeId string, heartbeat msg.ComponentHeartbeat, cache *compCache.ComponentCache, client *msg.PahoConnection) {
