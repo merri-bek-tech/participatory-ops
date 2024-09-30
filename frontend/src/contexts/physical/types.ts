@@ -40,6 +40,8 @@ export interface PhysicalLayerSummary {
 
 export interface ComponentDetails {
   hostName: string
+  productName: string
+  sysVendor: string
 }
 
 export interface ComponentStatus {

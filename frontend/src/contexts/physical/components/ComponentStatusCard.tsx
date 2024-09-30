@@ -1,5 +1,6 @@
-import { Card, CardBody, CardHeader, Heading, Table, TableContainer, Tbody, Td, Text, Th, Tr, useColorModeValue } from "@chakra-ui/react"
+import { Card, CardBody, CardHeader, Heading, HStack, Table, TableContainer, Tbody, Td, Text, Th, Tr, useColorModeValue, VStack } from "@chakra-ui/react"
 import { ComponentStatus } from "../types"
+import ComponentIcon from "./ComponentIcon"
 
 export default function ComponentStatusCard({ status, uuid, details }: ComponentStatus) {
   const colors = {
@@ -12,10 +13,15 @@ export default function ComponentStatusCard({ status, uuid, details }: Component
   return (
     <Card>
       <CardHeader bgColor={colors[status]} borderTopRadius={"inherit"}>
-        <Heading as="h3" fontSize="lg">
-          {hostName}
-        </Heading>
-        <Text fontSize="sm">{status}</Text>
+        <HStack>
+          {details && <ComponentIcon sysVendor={details.sysVendor} />}
+          <VStack alignItems="flex-start" justifyContent="flex-start" gap={0}>
+            <Heading as="h3" fontSize="lg">
+              {hostName}
+            </Heading>
+            <Text fontSize="sm">{status}</Text>
+          </VStack>
+        </HStack>
       </CardHeader>
       <CardBody>
         {details && (
