@@ -2,9 +2,9 @@ package broker
 
 import (
 	"log"
-	"os"
-	"os/signal"
-	"syscall"
+	// "os"
+	// "os/signal"
+	// "syscall"
 
 	mqtt "github.com/mochi-mqtt/server/v2"
 	"github.com/mochi-mqtt/server/v2/hooks/auth"
@@ -12,14 +12,16 @@ import (
 )
 
 func MessageBroker() {
+	log.Println("Starting MQTT broker")
+
 	// Create signals channel to run server until interrupted
-	sigs := make(chan os.Signal, 1)
-	done := make(chan bool, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		<-sigs
-		done <- true
-	}()
+	// sigs := make(chan os.Signal, 1)
+	// done := make(chan bool, 1)
+	// signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	// go func() {
+	// 	<-sigs
+	// 	done <- true
+	// }()
 
 	// Create the new MQTT Server.
 	server := mqtt.New(nil)
@@ -41,8 +43,12 @@ func MessageBroker() {
 		}
 	}()
 
+	log.Println("MQTT broker started")
+
 	// Run server until interrupted
-	<-done
+	// <-done
 
 	// Cleanup
+
+	// log.Println("Stopping MQTT broker")
 }

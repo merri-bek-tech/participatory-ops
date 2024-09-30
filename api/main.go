@@ -27,8 +27,8 @@ func main() {
 
 	e.Static("/", "/app/web")
 
-	go comps.MonitorComponents(caches)
 	go broker.MessageBroker()
+	go comps.MonitorComponents(caches)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
