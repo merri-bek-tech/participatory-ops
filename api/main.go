@@ -28,7 +28,7 @@ func main() {
 
 	e.Static("/", "/app/web")
 
-	go broker.MessageBroker(func() {
+	go broker.MessageBroker(func(inlineClient *broker.InlineClient) {
 		log.Println("Broker onStarted")
 		go comps.MonitorComponents(caches)
 	})

@@ -8,7 +8,7 @@ import (
 	"github.com/mochi-mqtt/server/v2/listeners"
 )
 
-func MessageBroker(onStarted func()) {
+func MessageBroker(onStarted func(inlineClient *InlineClient)) {
 	log.Println("Starting MQTT broker")
 
 	started := make(chan bool, 1)
@@ -44,6 +44,9 @@ func MessageBroker(onStarted func()) {
 	<-started
 
 	if onStarted != nil {
-		onStarted()
+		server.Publish("direct/publish", []byte("packet scheduled message"), false, 0)
+		inlineClient := BuildInlineClient(server)
+
+		onStarted(inlineClient)
 	}
 }
