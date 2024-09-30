@@ -1,4 +1,5 @@
-import { ComponentStatus, Scheme } from "./types"
+import { Scheme } from "./types"
+import { ComponentStatus } from "../physical/types"
 
 const defaultHeaders = {
   "Content-Type": "application/json",

@@ -1,6 +1,6 @@
 import { Box, Grid, GridItem, Heading } from "@chakra-ui/react"
-import ComponentStatusCard from "../components/ComponentStatusCard"
-import { ComponentStatus } from "../types"
+import ComponentStatusCard from "../../physical/components/ComponentStatusCard"
+import { ComponentStatus } from "../../physical/types"
 import Api from "../api"
 import { useContext, useEffect, useState } from "react"
 import { useInterval } from "usehooks-ts"

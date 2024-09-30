@@ -37,3 +37,13 @@ export interface PhysicalLayerSummary {
   sites: SiteSummary[]
   racks: Record<string, RackDetails>
 }
+
+export interface ComponentDetails {
+  hostName: string
+}
+
+export interface ComponentStatus {
+  status: "online" | "offline"
+  uuid: string
+  details?: ComponentDetails | null
+}

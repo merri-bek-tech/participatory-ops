@@ -23,7 +23,7 @@ export default function ComponentStatusCard({ status, uuid, details }: Component
             <Table variant="simple">
               <Tbody>
                 {Object.entries(details).map(([key, value]) => (
-                  <Tr>
+                  <Tr key={key}>
                     <Th p={0} w="1px" whiteSpace="nowrap" pr={2}>
                       {key}
                     </Th>
