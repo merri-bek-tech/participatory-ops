@@ -1,10 +1,11 @@
-package msg
+package client
 
 import (
 	"fmt"
 	"log"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
+	msg "parops.libs/msg"
 )
 
 type PahoConnection struct {
@@ -25,14 +26,14 @@ func Connect(deviceId string) *PahoConnection {
 	}
 }
 
-func (client *PahoConnection) GetGenericClient() MqttClient {
+func (client *PahoConnection) GetGenericClient() msg.MqttClient {
 	return &PahoClient{
 		Mqtt: &client.Mqtt,
 	}
 }
 
-func (client *PahoConnection) GetMessenger() *Messenger {
-	return &Messenger{
+func (client *PahoConnection) GetMessenger() *msg.Messenger {
+	return &msg.Messenger{
 		DeviceId: client.DeviceId,
 		Client:   client.GetGenericClient(),
 	}

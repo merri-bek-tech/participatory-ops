@@ -1,9 +1,10 @@
-package msg
+package client
 
 import (
 	"log"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
+	msg "parops.libs/msg"
 )
 
 var (
@@ -22,7 +23,7 @@ func (pahoClient *PahoClient) Publish(topic string, payload string) {
 	handleResult(token)
 }
 
-func (pahoClient *PahoClient) Subscribe(topicFilter string, handler SubscribeHandler) {
+func (pahoClient *PahoClient) Subscribe(topicFilter string, handler msg.SubscribeHandler) {
 	mqtt := *pahoClient.Mqtt
 	mqtt.Subscribe(topicFilter, AtMostOnce, func(client paho.Client, message paho.Message) {
 		handler(message.Topic(), string(message.Payload()))

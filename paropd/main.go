@@ -12,6 +12,8 @@ import (
 
 	configs "paropd/config"
 
+	"paropd/client"
+
 	"parops.libs/msg"
 )
 
@@ -19,7 +21,7 @@ const defaultTick = 6 * time.Second
 
 type AppData struct {
 	config *configs.Config
-	client *msg.PahoConnection
+	client *client.PahoConnection
 }
 
 func main() {
@@ -70,7 +72,7 @@ func (app *AppData) init() error {
 
 	log.Println("Initializing app")
 	app.config = configs.LoadConfig(true)
-	app.client = msg.Connect(app.config.Computed.Uuid)
+	app.client = client.Connect(app.config.Computed.Uuid)
 
 	handlers := msg.CommsHandlers{
 		HandleHeartbeat:  nil,
