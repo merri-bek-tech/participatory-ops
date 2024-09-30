@@ -3,12 +3,14 @@ package broker
 import (
 	"log"
 
+	"github.com/google/uuid"
 	mqtt "github.com/mochi-mqtt/server/v2"
 	"github.com/mochi-mqtt/server/v2/hooks/auth"
 	"github.com/mochi-mqtt/server/v2/listeners"
+	msg "parops.libs/msg"
 )
 
-func MessageBroker(onStarted func(inlineClient *InlineClient)) {
+func MessageBroker(onStarted func(messenger *msg.Messenger)) {
 	log.Println("Starting MQTT broker")
 
 	started := make(chan bool, 1)
@@ -44,9 +46,14 @@ func MessageBroker(onStarted func(inlineClient *InlineClient)) {
 	<-started
 
 	if onStarted != nil {
-		server.Publish("direct/publish", []byte("packet scheduled message"), false, 0)
-		inlineClient := BuildInlineClient(server)
+		// This is temporary, we need this to stay constant
+		deviceId := "api-" + uuid.New().String()
 
-		onStarted(inlineClient)
+		messenger := &msg.Messenger{
+			DeviceId: deviceId,
+			Client:   BuildInlineClient(server),
+		}
+
+		onStarted(messenger)
 	}
 }

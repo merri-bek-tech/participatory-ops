@@ -10,21 +10,21 @@ type publishFunc func(topic string, payload string)
 type subscribeFunc func(topicFilter string, handler msg.SubscribeHandler)
 
 type InlineClient struct {
-	Publish   publishFunc
-	Subscribe subscribeFunc
+	server *mqtt.Server
 }
 
-func BuildInlineClient(server *mqtt.Server) *InlineClient {
-	return &InlineClient{
-		Publish: func(topic string, payload string) {
-			server.Publish(topic, []byte(payload), false, 0)
-		},
-		Subscribe: func(topicFilter string, handler msg.SubscribeHandler) {
-			callbackFn := func(cl *mqtt.Client, sub packets.Subscription, pk packets.Packet) {
-				server.Log.Info("inline client received message from subscription", "client", cl.ID, "subscriptionId", sub.Identifier, "topic", pk.TopicName, "payload", string(pk.Payload))
-				handler(pk.TopicName, string(pk.Payload))
-			}
-			server.Subscribe(topicFilter, 1, callbackFn)
-		},
+func (inlineClient *InlineClient) Publish(topic string, payload string) {
+	inlineClient.server.Publish(topic, []byte(payload), false, 0)
+}
+
+func (inlineClient *InlineClient) Subscribe(topicFilter string, handler msg.SubscribeHandler) {
+	callbackFn := func(cl *mqtt.Client, sub packets.Subscription, pk packets.Packet) {
+		inlineClient.server.Log.Info("inline client received message from subscription", "client", cl.ID, "subscriptionId", sub.Identifier, "topic", pk.TopicName, "payload", string(pk.Payload))
+		handler(pk.TopicName, string(pk.Payload))
 	}
+	inlineClient.server.Subscribe(topicFilter, 1, callbackFn)
+}
+
+func BuildInlineClient(server *mqtt.Server) msg.MqttClient {
+	return &InlineClient{server: server}
 }

@@ -9,7 +9,7 @@ import (
 
 type Messenger struct {
 	DeviceId string
-	client   MqttClient
+	Client   MqttClient
 }
 
 func (messenger *Messenger) PublishMyHeartbeat(schemeId string) {
@@ -22,7 +22,7 @@ func (messenger *Messenger) PublishMyHeartbeat(schemeId string) {
 
 	topic := deviceTopic(schemeId, messenger.DeviceId)
 	text := encodeHeartbeat(payload)
-	messenger.client.Publish(topic, text)
+	messenger.Client.Publish(topic, text)
 }
 
 func (messenger *Messenger) PublishDetailsRequested(schemeId string, uuid string) {
@@ -31,13 +31,13 @@ func (messenger *Messenger) PublishDetailsRequested(schemeId string, uuid string
 
 	log.Println("Publishing details requested", topic)
 
-	messenger.client.Publish(topic, text)
+	messenger.Client.Publish(topic, text)
 }
 
 func (messenger *Messenger) PublishDetails(schemeId string, uuid string, details ComponentDetails) {
 	topic := deviceTopic(schemeId, uuid)
 	text := encodeComponentDetails(details)
-	messenger.client.Publish(topic, text)
+	messenger.Client.Publish(topic, text)
 }
 
 func (messenger *Messenger) SubscribeDevice(schemeId string, handlers CommsHandlers) {
@@ -53,7 +53,7 @@ func (messenger *Messenger) SubscribeAllComponents(handlers CommsHandlers) {
 func (messenger *Messenger) subscribe(topic string, handlers CommsHandlers) {
 	log.Println("Subscribing to topic: ", topic)
 
-	messenger.client.Subscribe(topic, func(topic string, payload string) {
+	messenger.Client.Subscribe(topic, func(topic string, payload string) {
 		// split the message payload by |
 		payloadParts := strings.Split(payload, "|")
 

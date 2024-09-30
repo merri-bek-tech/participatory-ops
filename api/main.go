@@ -8,6 +8,8 @@ import (
 	compCache "parops/components/component_cache"
 	"parops/schemes"
 
+	msg "parops.libs/msg"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -28,7 +30,7 @@ func main() {
 
 	e.Static("/", "/app/web")
 
-	go broker.MessageBroker(func(inlineClient *broker.InlineClient) {
+	go broker.MessageBroker(func(messenger *msg.Messenger) {
 		log.Println("Broker onStarted")
 		go comps.MonitorComponents(caches)
 	})

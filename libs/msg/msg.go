@@ -34,7 +34,7 @@ func (client *PahoConnection) GetGenericClient() MqttClient {
 func (client *PahoConnection) GetMessenger() *Messenger {
 	return &Messenger{
 		DeviceId: client.DeviceId,
-		client:   client.GetGenericClient(),
+		Client:   client.GetGenericClient(),
 	}
 }
 
