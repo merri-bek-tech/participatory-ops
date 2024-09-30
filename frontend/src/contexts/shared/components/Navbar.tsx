@@ -11,7 +11,7 @@ export default function Navbar() {
     <Box bg={useColorModeValue("gray.100", "gray.900")} px={4} borderBottomColor={useColorModeValue("gray.600", "black")} borderBottomWidth={2} borderBottomStyle="solid" boxShadow="md">
       <Flex alignItems={"center"} justifyContent={"space-between"}>
         <Stack direction="row" alignItems="center">
-          <Box>{scheme.name}</Box>
+          <Link href="/">{scheme.name}</Link>
         </Stack>
 
         <Flex alignItems={"center"} gap={4}>
