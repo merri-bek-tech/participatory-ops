@@ -1,7 +1,9 @@
+import { Box, Heading } from "@chakra-ui/react"
+
 export default function NodeOverview() {
   return (
-    <div>
-      <h1>Node Overview</h1>
-    </div>
+    <Box>
+      <Heading size="lg">This Node</Heading>
+    </Box>
   )
 }
