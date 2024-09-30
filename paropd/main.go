@@ -19,7 +19,7 @@ const defaultTick = 6 * time.Second
 
 type AppData struct {
 	config *configs.Config
-	client *msg.Client
+	client *msg.PahoConnection
 }
 
 func main() {

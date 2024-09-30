@@ -10,35 +10,35 @@ import (
 	paho "github.com/eclipse/paho.mqtt.golang"
 )
 
-var (
-	AtMostOnce  byte = 0
-	AtLeastOnce byte = 1
-	ExactlyOnce byte = 2
-)
-
-type Client struct {
+type PahoConnection struct {
 	DeviceId string
 	Mqtt     paho.Client
 }
 
-func Connect(deviceId string) *Client {
+func Connect(deviceId string) *PahoConnection {
 	client := connectClient(
 		"127.0.0.1",
 		1883,
 		deviceId,
 	)
 
-	return &Client{
+	return &PahoConnection{
 		DeviceId: deviceId,
 		Mqtt:     client,
 	}
 }
 
-func (client *Client) Disconnect() {
+func (client *PahoConnection) getGenericClient() Client {
+	return &PahoClient{
+		Mqtt: &client.Mqtt,
+	}
+}
+
+func (client *PahoConnection) Disconnect() {
 	client.Mqtt.Disconnect(250)
 }
 
-func (client *Client) PublishMyHeartbeat(schemeId string) {
+func (client *PahoConnection) PublishMyHeartbeat(schemeId string) {
 	payload := ComponentHeartbeat{
 		Uuid: client.DeviceId,
 		At:   time.Now().Unix(),
@@ -47,20 +47,20 @@ func (client *Client) PublishMyHeartbeat(schemeId string) {
 	client.publishHeartbeat(deviceTopic(schemeId, client.DeviceId), payload)
 }
 
-func (client *Client) PublishDetailsRequested(schemeId string, uuid string) {
+func (client *PahoConnection) PublishDetailsRequested(schemeId string, uuid string) {
 	client.publishDetailsRequested(deviceTopic(schemeId, uuid))
 }
 
-func (client *Client) PublishDetails(schemeId string, uuid string, details ComponentDetails) {
+func (client *PahoConnection) PublishDetails(schemeId string, uuid string, details ComponentDetails) {
 	text := encodeComponentDetails(details)
 	client.Mqtt.Publish(deviceTopic(schemeId, uuid), AtMostOnce, false, text)
 }
 
-func (client *Client) SubscribeAllComponents(handlers CommsHandlers) {
+func (client *PahoConnection) SubscribeAllComponents(handlers CommsHandlers) {
 	subscribe(allDevicesTopic(), client.Mqtt, handlers)
 }
 
-func (client *Client) SubscribeDevice(schemeId string, handlers CommsHandlers) {
+func (client *PahoConnection) SubscribeDevice(schemeId string, handlers CommsHandlers) {
 	subscribe(deviceTopic(schemeId, client.DeviceId), client.Mqtt, handlers)
 }
 
@@ -74,18 +74,20 @@ func allDevicesTopic() string {
 	return "schemes/+/components/+"
 }
 
-func (client *Client) publishHeartbeat(topic string, data ComponentHeartbeat) paho.Token {
+func (client *PahoConnection) publishHeartbeat(topic string, data ComponentHeartbeat) {
 	log.Println("Publishing heartbeat")
 
+	genericClient := client.getGenericClient()
 	text := encodeHeartbeat(data)
-	return client.Mqtt.Publish(topic, AtMostOnce, false, text)
+	genericClient.Publish(topic, text)
 }
 
-func (client *Client) publishDetailsRequested(topic string) paho.Token {
+func (client *PahoConnection) publishDetailsRequested(topic string) {
 	log.Println("Publishing details requested")
 
+	genericClient := client.getGenericClient()
 	text := encodeDetailsRequested()
-	return client.Mqtt.Publish(topic, AtMostOnce, false, text)
+	genericClient.Publish(topic, text)
 }
 
 func encodeHeartbeat(heartbeat ComponentHeartbeat) string {

@@ -55,7 +55,7 @@ func MonitorComponents(caches *map[string]*compCache.ComponentCache) {
 	client.SubscribeAllComponents(handlers)
 }
 
-func OnHeartbeat(schemeId string, heartbeat msg.ComponentHeartbeat, cache *compCache.ComponentCache, client *msg.Client) {
+func OnHeartbeat(schemeId string, heartbeat msg.ComponentHeartbeat, cache *compCache.ComponentCache, client *msg.PahoConnection) {
 	cache.OnHeartbeat(heartbeat)
 
 	component, exists := cache.Get(heartbeat.Uuid)
@@ -66,7 +66,7 @@ func OnHeartbeat(schemeId string, heartbeat msg.ComponentHeartbeat, cache *compC
 	}
 }
 
-func RequestDetails(schemeId string, component *compCache.Component, client *msg.Client) {
+func RequestDetails(schemeId string, component *compCache.Component, client *msg.PahoConnection) {
 	log.Printf("Requesting details for %s\n", component.Uuid)
 
 	client.PublishDetailsRequested(schemeId, component.Uuid)
