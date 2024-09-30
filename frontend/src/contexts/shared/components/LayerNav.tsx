@@ -1,5 +1,5 @@
-import { Box, Text, Heading, VStack, useColorModeValue } from "@chakra-ui/react"
-import Link from "./Link"
+import { Box, Select } from "@chakra-ui/react"
+import { useNavigate } from "react-router-dom"
 
 type LayerID = "application" | "capability" | "virtual" | "physical"
 
@@ -13,43 +13,28 @@ interface LayerLinkDetails {
   enabled: boolean
 }
 
-function LayerLink({ id, name, enabled, active }: LayerLinkDetails & { active: boolean }) {
-  if (active) {
-    return (
-      <Heading borderBottom="2px solid black" lineHeight="100%">
-        {name}
-      </Heading>
-    )
-  } else {
-    if (enabled) {
-      return (
-        <Link href={`/${id}`} borderBottomWidth={2} borderBottomColor={useColorModeValue("gray.900", "gray.100")}>
-          {name}
-        </Link>
-      )
-    } else {
-      return (
-        <Text color={"gray.600"} borderBottomWidth={2} borderBottomColor="gray.600">
-          {name}
-        </Text>
-      )
-    }
-  }
-}
-
 export default function LayerNav({ activeLayer }: LayerNavProps) {
   const layers: LayerLinkDetails[] = [
     { id: "application", name: "Application Layer", enabled: true },
     { id: "capability", name: "Capability Layer", enabled: false },
-    { id: "virtual", name: "Virtual Layer", enabled: true },
+    { id: "virtual", name: "Virtual Layer", enabled: false },
     { id: "physical", name: "Physical Layer", enabled: true },
   ]
 
+  const navigate = useNavigate()
+  const selectLayer = (layer: string) => {
+    navigate(`/${layer}`)
+  }
+
   return (
-    <VStack align="flex-start" mb={4}>
-      {layers.map((details) => {
-        return <LayerLink {...details} active={details.id == activeLayer} key={details.id} />
-      })}
-    </VStack>
+    <Box maxW={300} marginBottom="1.5em">
+      <Select variant="filled" value={activeLayer} onChange={(event) => selectLayer(event.target.value)}>
+        {layers.map((layer) => (
+          <option key={layer.id} value={layer.id} disabled={!layer.enabled}>
+            {layer.name}
+          </option>
+        ))}
+      </Select>
+    </Box>
   )
 }
