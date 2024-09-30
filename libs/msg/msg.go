@@ -44,10 +44,6 @@ func (client *PahoConnection) Disconnect() {
 	client.Mqtt.Disconnect(250)
 }
 
-func (client *PahoConnection) PublishDetailsRequested(schemeId string, uuid string) {
-	client.publishDetailsRequested(deviceTopic(schemeId, uuid))
-}
-
 func (client *PahoConnection) PublishDetails(schemeId string, uuid string, details ComponentDetails) {
 	text := encodeComponentDetails(details)
 	client.Mqtt.Publish(deviceTopic(schemeId, uuid), AtMostOnce, false, text)
@@ -62,59 +58,6 @@ func (client *PahoConnection) SubscribeDevice(schemeId string, handlers CommsHan
 }
 
 // PRIVATE
-
-func deviceTopic(schemeId string, uuid string) string {
-	return "schemes/" + schemeId + "/components/" + uuid
-}
-
-func allDevicesTopic() string {
-	return "schemes/+/components/+"
-}
-
-func (client *PahoConnection) publishDetailsRequested(topic string) {
-	log.Println("Publishing details requested")
-
-	genericClient := client.GetGenericClient()
-	text := encodeDetailsRequested()
-	genericClient.Publish(topic, text)
-}
-
-func encodeHeartbeat(heartbeat ComponentHeartbeat) string {
-	meta := Meta{
-		Type:    "ComponentHeartbeat",
-		Version: "1.0",
-	}
-
-	return encodeMessage(meta, heartbeat)
-}
-
-func encodeDetailsRequested() string {
-	meta := Meta{
-		Type:    "DetailsRequested",
-		Version: "1.0",
-	}
-
-	return encodeMessage(meta, nil)
-}
-
-func encodeComponentDetails(details ComponentDetails) string {
-	meta := Meta{
-		Type:    "ComponentDetails",
-		Version: "1.0",
-	}
-
-	return encodeMessage(meta, details)
-}
-
-func encodeMessage(meta Meta, body any) string {
-	metaText := jsonString(meta)
-	payloadText := ""
-	if body != nil {
-		payloadText = jsonString(body)
-	}
-
-	return strings.Join([]string{metaText, payloadText}, "|")
-}
 
 func connectClient(host string, port int, clientId string) paho.Client {
 	opts := paho.NewClientOptions()

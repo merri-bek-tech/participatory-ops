@@ -123,5 +123,5 @@ func (app *AppData) onDetailsRequested(schemeId string) {
 
 	log.Printf("Publishing details: %v\n", details)
 
-	app.client.PublishDetails(app.config.SchemeId, app.config.Computed.Uuid, details)
+	app.client.GetMessenger().PublishDetails(app.config.SchemeId, app.config.Computed.Uuid, details)
 }

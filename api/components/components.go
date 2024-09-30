@@ -69,6 +69,6 @@ func OnHeartbeat(schemeId string, heartbeat msg.ComponentHeartbeat, cache *compC
 func RequestDetails(schemeId string, component *compCache.Component, client *msg.PahoConnection) {
 	log.Printf("Requesting details for %s\n", component.Uuid)
 
-	client.PublishDetailsRequested(schemeId, component.Uuid)
+	client.GetMessenger().PublishDetailsRequested(schemeId, component.Uuid)
 	component.DetailsRequested()
 }
