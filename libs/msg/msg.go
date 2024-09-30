@@ -25,8 +25,6 @@ func Connect(deviceId string) *Client {
 	client := connectClient(
 		"127.0.0.1",
 		1883,
-		"paropd",
-		"be9eiQuo",
 		deviceId,
 	)
 
@@ -127,18 +125,11 @@ func encodeMessage(meta Meta, body any) string {
 	return strings.Join([]string{metaText, payloadText}, "|")
 }
 
-func connectClient(host string, port int, username string, password string, clientId string) paho.Client {
+func connectClient(host string, port int, clientId string) paho.Client {
 	opts := paho.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", host, port))
-	//opts.SetClientID(clientId) // set a name as you desire
-	// opts.SetUsername(username) // these are the credentials that you declare for your cluster (see readme)
-	// opts.SetPassword(password)
-	//opts.SetTLSConfig(&tls.Config{InsecureSkipVerify: true})
+	opts.SetClientID(clientId) // set a name as you desire
 
-	// (optionally) configure callback handlers that get called on certain events
-	// opts.SetDefaultPublishHandler(messagePubHandler)
-	// opts.OnConnect = connectHandler
-	// opts.OnConnectionLost = connectLostHandler
 	// create the client using the options above
 	client := paho.NewClient(opts)
 	// throw an error if the connection isn't successfull
