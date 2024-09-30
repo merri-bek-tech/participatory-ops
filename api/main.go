@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"parops/broker"
 	comps "parops/components"
@@ -27,8 +28,10 @@ func main() {
 
 	e.Static("/", "/app/web")
 
-	go broker.MessageBroker()
-	go comps.MonitorComponents(caches)
+	go broker.MessageBroker(func() {
+		log.Println("Broker onStarted")
+		go comps.MonitorComponents(caches)
+	})
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
