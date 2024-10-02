@@ -16,7 +16,7 @@ func (app *AppData) init() error {
 	log.Println("Initializing app")
 	app.config = configs.LoadConfig(true)
 
-	app.connectedApp = StartConnectedApp(app.config)
+	app.connect()
 
 	return nil
 }
@@ -36,8 +36,22 @@ func (app *AppData) Close() {
 	}
 }
 
+func (app *AppData) connect() {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("Recovered from panic: %v", r)
+			app.Close()
+			panic(r)
+		}
+	}()
+
+	app.connectedApp = StartConnectedApp(app.config)
+}
+
 func (app *AppData) HeartbeatTick() {
 	if app.connectedApp != nil {
 		app.connectedApp.HeartbeatTick()
+	} else {
+		app.connect()
 	}
 }

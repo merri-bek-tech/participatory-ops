@@ -19,14 +19,19 @@ func StartConnectedApp(config *configs.Config) *ConnectedApp {
 	result := &ConnectedApp{config: config}
 
 	broker := discovery.FindBroker()
+	if broker == nil {
+		log.Println("No broker found")
+		return nil
+	}
+
 	params := client.MqttConnectionParams{
 		Host: broker.Host,
 		Port: broker.Port,
 	}
 
-	result.client = client.Connect(config.Computed.Uuid, params)
+	log.Println("Broker found, starting connection", broker)
 
-	log.Println("Broker found, starting connection")
+	result.client = client.Connect(config.Computed.Uuid, params)
 
 	result.startSubscriptions()
 

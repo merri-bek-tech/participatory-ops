@@ -6,6 +6,7 @@ type BrokerLocation struct {
 }
 
 func FindBroker() *BrokerLocation {
+	// return nil
 	return &BrokerLocation{
 		Host: "127.0.0.1",
 		Port: 1883,

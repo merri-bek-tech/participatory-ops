@@ -36,7 +36,10 @@ func main() {
 			case s := <-signalChan:
 				switch s {
 				case syscall.SIGHUP:
-					app.init()
+					err := app.init()
+					if err != nil {
+						log.Println("Error initializing app", err)
+					}
 				case os.Interrupt:
 					log.Println("Interrupted.")
 					app.Close()
@@ -44,7 +47,6 @@ func main() {
 					os.Exit(1)
 				}
 			case <-ctx.Done():
-				log.Printf("Done.")
 				os.Exit(1)
 			}
 		}
@@ -57,11 +59,16 @@ func main() {
 }
 
 func run(ctx context.Context, app *AppData) error {
-	app.init()
+	err := app.init()
+	if err != nil {
+		log.Println("Error running app", err)
+		return err
+	}
 
 	for {
 		select {
 		case <-ctx.Done():
+			log.Println("Context done in the run function")
 			return nil
 		case <-time.Tick(defaultTick):
 			app.HeartbeatTick()
