@@ -140,7 +140,7 @@ func canReadOrMakeDir(dir string) bool {
 }
 
 func canMake(dir string) bool {
-	err := os.Mkdir(dir, 0755)
+	err := os.MkdirAll(dir, 0755)
 	if err != nil {
 		log.Println("Error making directory:", err)
 		return false
