@@ -66,3 +66,20 @@ func stringFromFile(filePath string) (result string, err error) {
 	str := strings.TrimSpace(string(bytes))
 	return str, nil
 }
+
+func stringFromFileStartingWith(filePath string, key string) (result string, err error) {
+	contents, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+
+	lines := strings.Split(string(contents), "\n")
+
+	for _, line := range lines {
+		if strings.HasPrefix(line, key) {
+			return strings.TrimSpace(line), nil
+		}
+	}
+
+	return "", nil
+}

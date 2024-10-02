@@ -1,7 +1,6 @@
 package computer
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -16,11 +15,16 @@ func ComputeArmConfig() *ComputedConfig {
 // Private Compute Functions
 
 func computeProductName() (result string, err error) {
-	return stringFromCpuInfo("Model"), nil
+	return stringFromCpuInfo("Model")
 }
 
 func computeSysVendor() (result string, err error) {
-	model := stringFromCpuInfo("Model")
+	model, err := stringFromCpuInfo("Model")
+
+	if err != nil {
+		return "", err
+	}
+
 	if strings.Contains(model, "Raspberry Pi") {
 		return "Raspberry Pi", nil
 	} else {
@@ -28,9 +32,12 @@ func computeSysVendor() (result string, err error) {
 	}
 }
 
-func stringFromCpuInfo(key string) (result string) {
-	command := fmt.Sprintf("cat /proc/cpuinfo | grep '^%s'", key)
-	line := stringFromCommand(command)
+func stringFromCpuInfo(key string) (result string, err error) {
+	line, fileErr := stringFromFileStartingWith("/proc/cpuinfo", key)
+	if fileErr != nil {
+		return "", fileErr
+	}
+
 	value := strings.Split(line, ":")[1]
-	return strings.TrimSpace(value)
+	return strings.TrimSpace(value), nil
 }
