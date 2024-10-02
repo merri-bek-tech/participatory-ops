@@ -14,9 +14,9 @@ ParOps consists of the following parts:
 
 ### Dependences
 
-Development on the paropd application requires the use of the Pkl (pickle) configuration language. It can be installed via instructions here:
+Paropd and Parops API need to be run on linux.
 
-https://pkl-lang.org/main/current/pkl-cli/index.html#installation
+Paropd requires nmap. Install with `apt install nmap` on ubuntu/debian systems if not present.
 
 ### Running Parops Locally
 

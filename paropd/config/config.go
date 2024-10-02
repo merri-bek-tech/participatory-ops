@@ -1,20 +1,17 @@
 package config
 
 import (
-	"context"
-	"fmt"
 	"log"
 	"os"
-	"paropd/config/computed"
-	"paropd/config/computer"
-	"reflect"
-	"strconv"
 
+	"paropd/config/computer"
+
+	"github.com/BurntSushi/toml"
 	"github.com/google/uuid"
 )
 
 type Config struct {
-	Computed *computed.ComputedConfig
+	Computed *computer.ComputedConfig
 	SchemeId string
 }
 
@@ -33,8 +30,8 @@ func LoadConfig(recompute bool) *Config {
 
 // Private
 
-func loadComputedConfig(configDir string, recompute bool) *computed.ComputedConfig {
-	filePath := configDir + "/computed.pkl"
+func loadComputedConfig(configDir string, recompute bool) *computer.ComputedConfig {
+	filePath := configDir + "/computed.toml"
 
 	// read existing computed config
 	data := readExistingComputedConfig(filePath)
@@ -43,16 +40,17 @@ func loadComputedConfig(configDir string, recompute bool) *computed.ComputedConf
 	if data == nil || recompute {
 		data = recomputeComputedConfig(data)
 
-		// save it to disk
+		// 	save it to disk
 		writeComputedConfig(filePath, data)
 	}
 
 	return data
 }
 
-func readExistingComputedConfig(filePath string) *computed.ComputedConfig {
+func readExistingComputedConfig(filePath string) *computer.ComputedConfig {
 	if canReadFile(filePath) {
-		computedConfig, err := computed.LoadFromPath(context.Background(), filePath)
+		var computedConfig *computer.ComputedConfig
+		_, err := toml.DecodeFile(filePath, &computedConfig)
 		if err != nil {
 			log.Println("Error loading computed config:", err)
 			return nil
@@ -62,21 +60,21 @@ func readExistingComputedConfig(filePath string) *computed.ComputedConfig {
 	return nil
 }
 
-func recomputeComputedConfig(existing *computed.ComputedConfig) *computed.ComputedConfig {
+func recomputeComputedConfig(existing *computer.ComputedConfig) *computer.ComputedConfig {
 	changed := computer.ComputeConfig()
 
 	changed.Uuid = getUuid(existing)
 	return changed
 }
 
-func getUuid(existing *computed.ComputedConfig) string {
+func getUuid(existing *computer.ComputedConfig) string {
 	if existing != nil && existing.Uuid != "" {
 		return existing.Uuid
 	}
 	return uuid.New().String()
 }
 
-func writeComputedConfig(filePath string, data *computed.ComputedConfig) {
+func writeComputedConfig(filePath string, data *computer.ComputedConfig) {
 	// open file for writing
 	file, err := os.Create(filePath)
 	if err != nil {
@@ -85,37 +83,13 @@ func writeComputedConfig(filePath string, data *computed.ComputedConfig) {
 	}
 	defer file.Close()
 
+	encoder := toml.NewEncoder(file)
+
 	// write data to file
-	output := dummyPklOutput(data)
-	_, err = file.WriteString(output)
+	err = encoder.Encode(data)
 	if err != nil {
 		log.Println("Error writing computed config file:", err)
 	}
-}
-
-// Pkl should do this for us, this is a hack
-func dummyPklOutput(data *computed.ComputedConfig) string {
-	s := *data
-	v := reflect.ValueOf(s)
-	typeOfS := v.Type()
-
-	output := ""
-
-	for i := 0; i < v.NumField(); i++ {
-		key := typeOfS.Field(i).Tag.Get("pkl")
-		value := dummyPklValueOutput(v.Field(i).Interface())
-		line := fmt.Sprintf("%s = %s", key, value)
-		output += line + "\n"
-	}
-	return output
-}
-
-func dummyPklValueOutput(input interface{}) string {
-	if str, ok := input.(string); ok {
-		return strconv.Quote(str)
-	}
-
-	return fmt.Sprintf("%v", input)
 }
 
 func candidateConfigDirs() []string {

@@ -3,12 +3,18 @@ package computer
 import (
 	"log"
 	"os"
-	"paropd/config/computed"
 	"strings"
 )
 
-func ComputeConfig() *computed.ComputedConfig {
-	return &computed.ComputedConfig{
+type ComputedConfig struct {
+	Uuid        string
+	HostName    string
+	ProductName string
+	SysVendor   string
+}
+
+func ComputeConfig() *ComputedConfig {
+	return &ComputedConfig{
 		HostName:    orBlank(computeHostname()),
 		ProductName: orBlank(computeProductName()),
 		SysVendor:   orBlank(computeSysVendor()),
