@@ -1,8 +1,10 @@
 package computer
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -14,10 +16,15 @@ type ComputedConfig struct {
 }
 
 func ComputeConfig() *ComputedConfig {
-	return &ComputedConfig{
-		HostName:    orBlank(computeHostname()),
-		ProductName: orBlank(computeProductName()),
-		SysVendor:   orBlank(computeSysVendor()),
+	arch := archCommand()
+
+	if arch == "x86_64" {
+		return ComputeX86Config()
+	} else if arch == "aarch64" {
+		return ComputeArmConfig()
+	} else {
+		log.Println("Unknown architecture: ", arch)
+		return &ComputedConfig{}
 	}
 }
 
@@ -27,15 +34,21 @@ func computeHostname() (result string, err error) {
 	return os.Hostname()
 }
 
-func computeProductName() (result string, err error) {
-	return stringFromFile("/sys/devices/virtual/dmi/id/product_name")
-}
-
-func computeSysVendor() (result string, err error) {
-	return stringFromFile("/sys/devices/virtual/dmi/id/sys_vendor")
-}
-
 // Private Helpers
+
+func archCommand() string {
+	return stringFromCommand("arch")
+}
+
+func stringFromCommand(command string) string {
+	cmd := exec.Command(command)
+	out, err := cmd.Output()
+	if err != nil {
+		// if there was any error, print it here
+		fmt.Println("could not run command: ", command, err)
+	}
+	return strings.TrimSpace(string(out))
+}
 
 func orBlank(result string, err error) string {
 	if err != nil {
