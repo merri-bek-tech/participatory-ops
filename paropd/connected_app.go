@@ -4,6 +4,7 @@ import (
 	"log"
 	"paropd/client"
 	configs "paropd/config"
+	"paropd/discovery"
 	"paropd/telemetry"
 
 	"parops.libs/msg"
@@ -16,9 +17,11 @@ type ConnectedApp struct {
 
 func StartConnectedApp(config *configs.Config) *ConnectedApp {
 	result := &ConnectedApp{config: config}
+
+	broker := discovery.FindBroker()
 	params := client.MqttConnectionParams{
-		Host: "127.0.0.1",
-		Port: 1883,
+		Host: broker.Host,
+		Port: broker.Port,
 	}
 
 	result.client = client.Connect(config.Computed.Uuid, params)
