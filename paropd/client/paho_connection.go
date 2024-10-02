@@ -18,11 +18,19 @@ type MqttConnectionParams struct {
 	Port int
 }
 
-func Connect(deviceId string, connectionParams MqttConnectionParams) *PahoConnection {
+type OnConnectHandler func(*PahoConnection)
+
+func Connect(deviceId string, connectionParams MqttConnectionParams, onConnect OnConnectHandler) *PahoConnection {
 	client := connectClient(
 		connectionParams.Host,
 		connectionParams.Port,
 		deviceId,
+		func(client paho.Client) {
+			onConnect(&PahoConnection{
+				DeviceId: deviceId,
+				Mqtt:     client,
+			})
+		},
 	)
 
 	return &PahoConnection{
@@ -50,10 +58,12 @@ func (client *PahoConnection) Disconnect() {
 
 // PRIVATE
 
-func connectClient(host string, port int, clientId string) paho.Client {
+func connectClient(host string, port int, clientId string, onConnected paho.OnConnectHandler) paho.Client {
 	opts := paho.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", host, port))
-	opts.SetClientID(clientId) // set a name as you desire
+	opts.SetClientID(clientId)
+	opts.SetAutoReconnect(true)
+	opts.SetOnConnectHandler(onConnected)
 
 	// create the client using the options above
 	client := paho.NewClient(opts)

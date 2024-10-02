@@ -31,9 +31,10 @@ func StartConnectedApp(config *configs.Config) *ConnectedApp {
 
 	log.Println("Broker found, starting connection", broker)
 
-	result.client = client.Connect(config.Computed.Uuid, params)
-
-	result.startSubscriptions()
+	client.Connect(config.Computed.Uuid, params, func(connection *client.PahoConnection) {
+		result.client = connection
+		result.startSubscriptions()
+	})
 
 	return result
 }
