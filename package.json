@@ -1,6 +1,6 @@
 {
   "name": "parops",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch-frontend": "cd frontend && npm run dev",
