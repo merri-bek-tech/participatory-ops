@@ -26,7 +26,7 @@ func main() {
 
 	defer func() {
 		signal.Stop(signalChan)
-		app.close()
+		app.Close()
 		cancel()
 	}()
 
@@ -39,7 +39,7 @@ func main() {
 					app.init()
 				case os.Interrupt:
 					log.Println("Interrupted.")
-					app.close()
+					app.Close()
 					cancel()
 					os.Exit(1)
 				}
@@ -64,7 +64,7 @@ func run(ctx context.Context, app *AppData) error {
 		case <-ctx.Done():
 			return nil
 		case <-time.Tick(defaultTick):
-			app.client.GetMessenger().PublishMyHeartbeat(app.config.SchemeId)
+			app.HeartbeatTick()
 		}
 	}
 }
