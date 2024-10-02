@@ -18,11 +18,9 @@ func StartConnectedApp(config *configs.Config) *ConnectedApp {
 	result := &ConnectedApp{config: config}
 	result.client = client.Connect(config.Computed.Uuid)
 
-	handlers := msg.CommsHandlers{
-		HandleHeartbeat:  nil,
-		DetailsRequested: func(schemeId string) { result.onDetailsRequested(schemeId) },
-	}
-	result.client.GetMessenger().SubscribeDevice(config.SchemeId, handlers)
+	log.Println("Broker found, starting connection")
+
+	result.startSubscriptions()
 
 	return result
 }
@@ -37,6 +35,15 @@ func (app *ConnectedApp) Close() {
 
 func (app *ConnectedApp) HeartbeatTick() {
 	app.client.GetMessenger().PublishMyHeartbeat(app.config.SchemeId)
+}
+
+func (app *ConnectedApp) startSubscriptions() {
+	handlers := msg.CommsHandlers{
+		HandleHeartbeat:  nil,
+		DetailsRequested: func(schemeId string) { app.onDetailsRequested(schemeId) },
+	}
+	app.client.GetMessenger().SubscribeDevice(app.config.SchemeId, handlers)
+
 }
 
 func (app *ConnectedApp) onDetailsRequested(schemeId string) {
