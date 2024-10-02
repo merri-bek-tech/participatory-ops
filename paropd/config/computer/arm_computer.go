@@ -29,7 +29,7 @@ func computeSysVendor() (result string, err error) {
 }
 
 func stringFromCpuInfo(key string) (result string) {
-	command := fmt.Sprintf("/proc/cpuinfo | grep '^%s'", key)
+	command := fmt.Sprintf("cat /proc/cpuinfo | grep '^%s'", key)
 	line := stringFromCommand(command)
 	value := strings.Split(line, ":")[1]
 	return strings.TrimSpace(value)
