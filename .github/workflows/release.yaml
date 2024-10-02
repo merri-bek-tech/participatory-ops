@@ -17,3 +17,19 @@ jobs:
           github_token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
           goos: linux
           goarch: amd64
+  releases-matrix:
+    name: Release Parops Binary
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux]
+        goarch: [amd64, arm64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: wangyoucao577/go-release-action@v1
+        with:
+          github_token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          goversion: "https://dl.google.com/go/go1.13.1.linux-amd64.tar.gz"
+          project_path: "./paropd"
