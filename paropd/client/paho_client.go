@@ -2,6 +2,7 @@ package client
 
 import (
 	"log"
+	"time"
 
 	paho "github.com/eclipse/paho.mqtt.golang"
 	msg "parops.libs/msg"
@@ -33,7 +34,8 @@ func (pahoClient *PahoClient) Subscribe(topicFilter string, handler msg.Subscrib
 // PRIVATE
 
 func handleResult(token paho.Token) {
-	token.Wait()
+	token.WaitTimeout(5 * time.Second)
+
 	// Check for errors during publishing (More on error reporting https://pkg.go.dev/github.com/eclipse/paho.mqtt.golang#readme-error-handling)
 	if token.Error() != nil {
 		log.Println("Failed to publish to topic")
