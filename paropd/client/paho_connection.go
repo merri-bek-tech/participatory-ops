@@ -13,10 +13,15 @@ type PahoConnection struct {
 	Mqtt     paho.Client
 }
 
-func Connect(deviceId string) *PahoConnection {
+type MqttConnectionParams struct {
+	Host string
+	Port int
+}
+
+func Connect(deviceId string, connectionParams MqttConnectionParams) *PahoConnection {
 	client := connectClient(
-		"127.0.0.1",
-		1883,
+		connectionParams.Host,
+		connectionParams.Port,
 		deviceId,
 	)
 

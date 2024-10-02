@@ -16,7 +16,12 @@ type ConnectedApp struct {
 
 func StartConnectedApp(config *configs.Config) *ConnectedApp {
 	result := &ConnectedApp{config: config}
-	result.client = client.Connect(config.Computed.Uuid)
+	params := client.MqttConnectionParams{
+		Host: "127.0.0.1",
+		Port: 1883,
+	}
+
+	result.client = client.Connect(config.Computed.Uuid, params)
 
 	log.Println("Broker found, starting connection")
 
