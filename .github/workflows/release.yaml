@@ -23,3 +23,4 @@ jobs:
           goarch: ${{ matrix.goarch }}
           goversion: 1.23.1
           project_path: "./paropd"
+          binary_name: "paropd"
