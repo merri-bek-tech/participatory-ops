@@ -10,9 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	configs "paropd/config"
-
 	"paropd/client"
+	configs "paropd/config"
+	"paropd/telemetry"
 
 	"parops.libs/msg"
 )
@@ -116,14 +116,5 @@ func (app *AppData) onDetailsRequested(schemeId string) {
 		return
 	}
 
-	details := msg.ComponentDetails{
-		Uuid:        app.config.Computed.Uuid,
-		HostName:    app.config.Computed.HostName,
-		ProductName: app.config.Computed.ProductName,
-		SysVendor:   app.config.Computed.SysVendor,
-	}
-
-	log.Printf("Publishing details: %v\n", details)
-
-	app.client.GetMessenger().PublishDetails(app.config.SchemeId, app.config.Computed.Uuid, details)
+	telemetry.SendDetails(app.config, app.client)
 }
