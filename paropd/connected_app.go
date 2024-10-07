@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"paropd/checks"
 	"paropd/client"
 	configs "paropd/config"
 	"paropd/discovery"
@@ -11,12 +12,13 @@ import (
 )
 
 type ConnectedApp struct {
-	config *configs.Config
-	client *client.PahoConnection
+	config       *configs.Config
+	client       *client.PahoConnection
+	checkManager *checks.CheckManager
 }
 
 func StartConnectedApp(config *configs.Config) *ConnectedApp {
-	result := &ConnectedApp{config: config}
+	result := &ConnectedApp{config: config, checkManager: &checks.CheckManager{}}
 
 	broker := discovery.FindBroker()
 	if broker == nil {
@@ -34,6 +36,7 @@ func StartConnectedApp(config *configs.Config) *ConnectedApp {
 	client.Connect(config.Computed.Uuid, params, func(connection *client.PahoConnection) {
 		result.client = connection
 		result.startSubscriptions()
+		result.checkManager.Start()
 	})
 
 	return result
@@ -44,6 +47,7 @@ func (app *ConnectedApp) Close() {
 		log.Println("Closing client connection")
 		app.client.Disconnect()
 		app.client = nil
+		app.checkManager.Close()
 	}
 }
 
